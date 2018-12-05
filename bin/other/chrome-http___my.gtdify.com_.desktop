@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.0
+Name=TRACKS::List tasks
+Exec=/opt/google/chrome/google-chrome --app="http://my.gtdify.com/"
+Terminal=false
+Icon=chrome-http___my.gtdify.com_
+Type=Application
+Categories=Network;WebBrowser;

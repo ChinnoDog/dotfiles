@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#************************************************#
+#                   sudorsync                    #
+#           written by Stephen Nichols           #
+#         Email: ChinnoDog@lonesheep.net         #
+#                August 6, 2010                  #
+#                                                #
+#        rsync using sudo on remote end          #
+#************************************************#
+
+BUILD=1		#will write routine to print this with -? later
+
+stty -echo
+read -p "[sudorsync] password for remote user: " REMOTEPASS; echo
+stty echo
+
+# update the sudo timestamp as part of the remote rsync command
+rsync --rsync-path="echo $REMOTEPASS|sudo -S -p $(()) -v;sudo rsync" $*

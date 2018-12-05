@@ -1,0 +1,28 @@
+#!/bin/sh
+# Set up and customize new 'buntu install
+
+# Prepare apt
+sudo apt-get update
+
+# install additional packages
+
+# Set up ssh
+#	Generate keys if necessary
+#	ssh-copy-id to all necessary servers
+
+# Set up GitHub 
+# http://help.github.com/linux-set-up-git/
+#	Don't forget to add ssh key to Github!
+#	test access somehow.
+sudo apt-get install -y git
+git config --global user.name "Stephen Nichols"
+git config --global user.email "ChinnoDog@lonesheep.net"
+git config --global github.user ChinnoDog
+git config --global github.token 590e10efb95515614edffd82dcff8c01
+
+# Set up exim4
+sudo apt-get install -y exim4
+# http://pricklytech.wordpress.com/2011/08/06/ubuntu-server-configuring-exim4-to-send-email-via-gmail/
+
+# user profile setup
+#	If downloads directory is empty then add cron job to flush it regularly

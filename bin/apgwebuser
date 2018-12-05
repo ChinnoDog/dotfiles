@@ -1,0 +1,4 @@
+#! /bin/bash
+
+apg -m 8 -x 8 -t -n 1 -M SNCL -E Ol\`\'
+

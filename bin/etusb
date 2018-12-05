@@ -1,0 +1,2 @@
+#!/bin/sh
+until easytether-usb -d ; do echo $(date) Reconnecting... && sleep 1; done

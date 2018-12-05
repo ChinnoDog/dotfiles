@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.0
+Name=Gmail
+Exec=/opt/google/chrome/google-chrome --app="https://mail.google.com/mail"
+Terminal=false
+Icon=chrome-https___mail.google.com_mail
+Type=Application
+Categories=Network;WebBrowser;

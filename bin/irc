@@ -1,0 +1,2 @@
+#!/bin/sh
+until ssh -t tulip.lonesheep.net screen -dRR; do echo $(date) Reconnecting... && sleep 5; done

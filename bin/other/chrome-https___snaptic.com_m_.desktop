@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.0
+Name=snaptic - ChinnoDog@lonesheep.net
+Exec=/opt/google/chrome/google-chrome --app="https://snaptic.com/m/"
+Terminal=false
+Icon=chrome-https___snaptic.com_m_
+Type=Application
+Categories=Network;WebBrowser;

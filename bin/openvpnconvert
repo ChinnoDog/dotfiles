@@ -1,0 +1,6 @@
+#!/bin/bash
+# http://askubuntu.com/questions/450493/openvpn-cant-import-configurations-on-new-14-04-installation
+sed '1,/<ca>/d;/<\/ca>/,$d' client.ovpn > ca.crt
+sed '1,/<cert>/d;/<\/cert>/,$d' client.ovpn > client.crt
+sed '1,/<key>/d;/<\/key>/,$d' client.ovpn > client.key
+sed '1,/<tls-auth>/d;/<\/tls-auth>/,$d' client.ovpn > ta.key

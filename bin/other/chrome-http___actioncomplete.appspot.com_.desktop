@@ -1,0 +1,9 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.0
+Name=ActionComplete - Dashboard
+Exec=/opt/google/chrome/google-chrome --app="http://actioncomplete.appspot.com/"
+Terminal=false
+Icon=chrome-http___actioncomplete.appspot.com_
+Type=Application
+Categories=Network;WebBrowser;
