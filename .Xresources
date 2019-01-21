@@ -1,0 +1,31 @@
+! Allow sixel graphics. (Try: "convert -colors 16 foo.jpg sixel:-").
+xterm*decTerminalID : vt340
+XTerm*renderFont: true
+XTerm*faceName: Noto Mono
+XTerm*faceSize: 12
+Xterm.vt100.geometry: 80x32
+XTerm.termName: xterm-256color
+XTerm.vt100.metaSendsEscape: true
+XTerm.vt100.saveLines: 16384
+XTerm.vt100.selectToClipboard: true
+XTerm.vt100.translations: #override \n\
+  Shift <Btn1Up>: exec-formatted("x-www-browser '%t'", PRIMARY) \n\
+  Ctrl Shift <Key>C: copy-selection(CLIPBOARD) \n\
+  Ctrl Shift <Key>V: insert-selection(CLIPBOARD) \n\
+  Ctrl <Key>M: maximize() \n\
+  Ctrl <Key>R: restore() \n\
+  Ctrl Alt <Key>S: secure()
+XTerm.vt100.foreground: white
+XTerm.vt100.background: dark slate grey
+! XTerm.vt100.color0: rgb:28/28/28
+XTerm.vt100.bellIsUrgent: true
+
+! Screen settings
+Xft.dpi: 180
+Xft.autohint: 0
+Xft.lcdfilter:  lcddefault
+Xft.hintstyle:  hintfull
+Xft.hinting: 1
+Xft.antialias: 1
+Xft.rgba: rgb
+
