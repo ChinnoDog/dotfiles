@@ -5,7 +5,8 @@
   become: true
   vars:
     packages:
-      - imwheel
+      # imwheel seems to be crashy
+      # - imwheel
   tasks:
     - name: Install software
       apt:
