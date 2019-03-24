@@ -1,0 +1,10 @@
+#!/bin/sh
+# get latest release
+export ARCH=amd64  # can be 'i386', 'amd64' or 'armhf'
+export VER=1.18
+wget "https://github.com/scaleway/scaleway-cli/releases/download/v${VER}/scw_${VER}_${ARCH}.deb" -O /tmp/scw.deb
+sudo dpkg -i /tmp/scw.deb && rm -f /tmp/scw.deb
+
+# test
+scw version
+
