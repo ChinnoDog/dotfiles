@@ -1,0 +1,14 @@
+#!/bin/sh
+# Note: enclose parameter in single quotes when calling to prevent shell
+# expansion. E.g. mycommand '*.html'
+
+# This was done as a programming exercise for an interview
+exit $( \
+  find . \
+  -maxdepth 1 \
+  -type f \
+  -name "$1" \
+  -exec rm '{}' \; \
+  -exec echo '' \; \
+  | wc -l)
+
