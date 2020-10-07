@@ -1,0 +1,19 @@
+#!/bin/sh
+NAME=fcos-stable-instance
+VOL=~/.local/share/libvirt/images
+IGN=$VOL/ignition.ign
+cp -f --reflink=auto $1 $IGN
+cd $VOL
+virt-install \
+  --connect="qemu:///session" \
+  --name "$NAME" \
+  --vcpu=4 \
+  --memory=2048 \
+  --os-variant="fedora32" \
+  --import --graphics="none" \
+  --disk="size=10,cache=unsafe,backing_store=fcos-stable.qcow2" \
+  --qemu-commandline="-fw_cfg name=opt/com.coreos/config,file=$IGN" \
+  --cpu=host-passthrough
+virsh destroy $NAME
+virsh undefine --remove-all-storage $NAME
+

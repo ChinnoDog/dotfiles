@@ -1,0 +1,5 @@
+#!/bin/sh
+FILENAME=$(coreos-installer download -p qemu -f qcow2.xz -d -C ~/Downloads/ | tail -n 1)
+echo "Compressing..."
+qemu-img convert -c -O qcow2 -o nocow $FILENAME fcos-stable.qcow2
+rm $FILENAME
