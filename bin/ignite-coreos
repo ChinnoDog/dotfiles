@@ -13,7 +13,8 @@ virt-install \
   --import --graphics="none" \
   --disk="size=10,cache=unsafe,backing_store=fcos-stable.qcow2" \
   --qemu-commandline="-fw_cfg name=opt/com.coreos/config,file=$IGN" \
-  --cpu=host-passthrough
+  --cpu=host-passthrough \
+  --network="bridge=virbr0"
 virsh destroy $NAME
 virsh undefine --remove-all-storage $NAME
 
