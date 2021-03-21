@@ -2,8 +2,13 @@
 NAME=fcos-stable-instance
 VOL=~/.local/share/libvirt/images
 IGN=$VOL/ignition.ign
-cp -f --reflink=auto $1 $IGN
+
+# Convert yaml to ignition file
+fcct $1 > $IGN
+
+# Why does virt-install only work in the storage dir?
 cd $VOL
+
 virt-install \
   --connect="qemu:///session" \
   --name "$NAME" \
@@ -15,6 +20,8 @@ virt-install \
   --qemu-commandline="-fw_cfg name=opt/com.coreos/config,file=$IGN" \
   --cpu=host-passthrough \
   --network="bridge=virbr0"
+
+# Clean up the mess
 virsh destroy $NAME
 virsh undefine --remove-all-storage $NAME
 
