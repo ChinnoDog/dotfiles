@@ -61,8 +61,12 @@
       - gimp
       - inkscape
       - keepassxc
-      - solaar
       - atom
+      # Display decorations
+      - gnome-tweaks
+      - solaar
+      - gnome-shell-extensions
+      - gnome-shell-extension-system-monitor
 
   - name: Install snaps
     snap:
@@ -99,7 +103,7 @@
   - name: Install Shadow.tech
     get_url:
       url: https://update.shadow.tech/launcher/prod/linux/ubuntu_18.04/Shadow.AppImage
-      dest: /opt
+      dest: /opt/Shadow.AppImage
       mode: 0755
 
   #- name: Enable livepatch
