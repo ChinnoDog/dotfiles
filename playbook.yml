@@ -1,0 +1,106 @@
+---
+- name: Configure Ubuntu Laptop
+  hosts: all
+  become: true
+  vars:
+
+  pre_tasks:
+
+  - name: Enable extra Ubuntu repos
+    shell: apt-add-repository -y -n main universe restricted multiverse
+    changed_when: false
+
+  - name: Import helm key
+    apt_key:
+      url: https://baltocdn.com/helm/signing.asc
+
+  - name: Add helm repo
+    apt_repository:
+      repo: deb https://baltocdn.com/helm/stable/debian/ all main
+      filename: helm-stable-debian
+      update_cache: false
+
+  - name: Add KeePassXC PPA
+    apt_repository:
+      repo: ppa:phoerious/keepassxc
+
+  - name: Add Atom gpg key
+    apt_key:
+      url: https://packagecloud.io/AtomEditor/atom/gpgkey
+
+  - name: Add Atom PPA
+    apt_repository:
+      repo: deb [arch=amd64] https://packagecloud.io/AtomEditor/atom/any/ any main
+      filename: atom
+      update_cache: false
+
+  #- name: Add Dropbox key
+  #  apt_key:
+  #    keyserver: pool.sks-keyservers.net
+  #    id: 1C61A2656FB57B7E4DE0F4C1FC918B335044912E
+
+  #- name: Add Dropbox repository
+  #  apt_repository:
+  #    repo: deb https://linux.dropbox.com/ubuntu groovy main
+  #    filename: dropbox-official
+
+  - name: Install packages
+    apt:
+      update_cache: true
+      name:
+      # prereq
+      - apt-transport-https
+      - ubuntu-desktop
+      - flatpak
+      # Needed for dropbox
+      - python3-gpg
+      # cli
+      - atop
+      - octave
+      # gui
+      - gimp
+      - inkscape
+      - keepassxc
+      - solaar
+      - atom
+
+  - name: Install snaps
+    snap:
+      name:
+      - spotify
+      - multipass
+      - canonical-livepatch
+
+  - name: Add flathub remote
+    flatpak_remote:
+      name: flathub
+      flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+
+  - name: Install flatpaks
+    flatpak:
+      name: "{{item}}"
+    with_items:
+    #- com.axosoft.GitKraken
+    - com.calibre_ebook.calibre
+    - com.jetbrains.PyCharm-Community
+    - net.ankiweb.Anki
+    - net.sourceforge.ExtremeTuxRacer
+    - org.kde.digikam
+    - us.zoom.Zoom
+    - com.axosoft.GitKraken 
+    - com.slack.Slack
+    - com.discordapp.Discord
+    #- com.spotify.Client
+
+  - name: Install Dropbox
+    apt:
+      deb: https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2020.03.04_amd64.deb
+
+  - name: Install Shadow.tech
+    get_url:
+      url: https://update.shadow.tech/launcher/prod/linux/ubuntu_18.04/Shadow.AppImage
+      dest: /opt
+      mode: 0755
+
+  #- name: Enable livepatch
+  #  shell: canonical-livepatch enable 
