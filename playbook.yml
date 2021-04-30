@@ -34,6 +34,14 @@
       filename: atom
       update_cache: false
 
+  - name: Add Virtualbox key
+    apt_key:
+      url: https://www.virtualbox.org/download/oracle_vbox_2016.asc
+
+  - name: Add VirtualBox PPA
+    apt_repository:
+      repo: deb [arch=amd64] https://download.virtualbox.org/virtualbox/debian eoan contrib
+
   #- name: Add Dropbox key
   #  apt_key:
   #    keyserver: pool.sks-keyservers.net
@@ -52,6 +60,7 @@
       - apt-transport-https
       - ubuntu-desktop
       - flatpak
+      - flatpak-builder
       # Needed for dropbox
       - python3-gpg
       # cli
@@ -62,6 +71,7 @@
       - inkscape
       - keepassxc
       - atom
+      - virtualbox-6.1
       # Display decorations
       - gnome-tweaks
       - solaar
