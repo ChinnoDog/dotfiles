@@ -23,6 +23,7 @@
   - name: Add KeePassXC PPA
     apt_repository:
       repo: ppa:phoerious/keepassxc
+      filename: keepassxc
 
   - name: Add Atom gpg key
     apt_key:
@@ -34,13 +35,14 @@
       filename: atom
       update_cache: false
 
-  - name: Add Virtualbox key
+  - name: Add Multisystem key
     apt_key:
-      url: https://www.virtualbox.org/download/oracle_vbox_2016.asc
+      url: http://liveusb.info/multisystem/depot/multisystem.asc
 
-  - name: Add VirtualBox PPA
+  - name: Add multisystem PPA
     apt_repository:
-      repo: deb [arch=amd64] https://download.virtualbox.org/virtualbox/debian eoan contrib
+      repo: deb http://liveusb.info/multisystem/depot all main
+      filename: multisystem
 
   #- name: Add Dropbox key
   #  apt_key:
@@ -58,7 +60,6 @@
       name:
       # prereq
       - apt-transport-https
-      - ubuntu-desktop
       - flatpak
       - flatpak-builder
       # Needed for dropbox
@@ -71,7 +72,8 @@
       - inkscape
       - keepassxc
       - atom
-      - virtualbox-6.1
+      - virtualbox
+      - multisystem
       # Display decorations
       - gnome-tweaks
       - solaar
