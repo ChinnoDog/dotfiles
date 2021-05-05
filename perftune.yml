@@ -1,0 +1,82 @@
+---
+- name: Tune performance
+  hosts: all
+  become: true
+  vars:
+    aptArchiveDir: /subvols/hdd/@system/apt-archives
+  tasks:
+
+  - name: Create subvol dirs
+    file:
+      path: "{{item}}"
+      state: directory
+    loop:
+    - /subvols
+    - /subvols/ssd
+    - /subvols/hdd
+
+  - name: Configure btrfs mounts
+    mount:
+      src: "{{ item.src }}"
+      path: "{{ item.path }}"
+      fstype: btrfs
+      opts: "{{ item.opts | join(',') }}"
+      state: mounted
+    loop:
+    - src: /dev/mapper/cryptssd
+      path: /
+      opts:
+      - defaults
+      - noatime
+      - compress-force=zstd:7
+      - subvol=@
+      - ssd
+      - discard
+    - src: /dev/mapper/cryptssd
+      path: /subvols/ssd
+      opts:
+      - defaults
+      - noatime
+      - compress-force=zstd:7
+      - ssd
+      - discard
+    - src: /dev/mapper/crypthdd
+      path: /subvols/hdd
+      opts:
+      - defaults
+      - noatime
+      - compress-force=zstd:7
+
+  - name: Create subvolumes
+    shell: "btrfs subvolume create /subvols/{{item}}"
+    args:
+      creates: "/subvols/{{item}}"
+    loop:
+    - hdd/@system
+    - hdd/@dropbox
+
+  - name: Delete old apt archive directory
+    file:
+      path: /var/cache/apt/archives
+      state: absent
+
+  - name: configure alternate apt archive directory
+    file:
+      path: "{{aptArchiveDir}}"
+      state: directory
+      mode: 0755
+      owner: root
+      group: root
+      attr: +C
+
+  - name: Configure apt to use alternate archive dir
+    copy:
+      dest: /etc/apt/apt.conf.d/99alt-cache
+      content: |
+        # Added by SRN
+        Dir::Cache::Archives "{{aptArchiveDir}}/";
+        
+        # Work around bug that prevents apt saving packages
+        # See: https://askubuntu.com/questions/897513/apt-command-does-not-cache-the-deb-files
+        Binary::apt::APT::Keep-Downloaded-Packages "true";
+
