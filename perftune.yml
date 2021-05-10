@@ -4,6 +4,9 @@
   become: true
   vars:
     aptArchiveDir: /subvols/hdd/@system/apt-archives
+    nocowDirs:
+    - "{{aptArchiveDir}}"
+    - /var/lib/snapd
   tasks:
 
   - name: Create subvol dirs
@@ -54,11 +57,29 @@
     loop:
     - hdd/@system
     - hdd/@dropbox
+    - hdd/@swap
 
-  - name: Delete old apt archive directory
+  - name: Mark swap subvol as nocow
     file:
-      path: /var/cache/apt/archives
-      state: absent
+      path: "/subvols/hdd/@swap"
+      state: directory
+      attr: +C
+
+  - name: Create the swapfile
+    shell: |
+      truncate -s 0 swapfile
+      btrfs property set ./swapfile compression none
+      chmod 600 swapfile
+      dd if=/dev/zero of=swapfile bs=64M count={{(ansible_memtotal_mb/64)|round(0,'ceil')|int}}
+      mkswap swapfile
+    args:
+      creates: swapfile
+      chdir: /subvols/hdd/@swap/
+
+  - name: Move the apt archive directory
+    shell: "mv /var/cache/apt/archives {{aptArchiveDir}}"
+    args:
+      creates: "{{aptArchiveDir}}"
 
   - name: configure alternate apt archive directory
     file:
@@ -67,7 +88,6 @@
       mode: 0755
       owner: root
       group: root
-      attr: +C
 
   - name: Configure apt to use alternate archive dir
     copy:
@@ -80,3 +100,36 @@
         # See: https://askubuntu.com/questions/897513/apt-command-does-not-cache-the-deb-files
         Binary::apt::APT::Keep-Downloaded-Packages "true";
 
+  - name: Check for nocow directories
+    stat:
+      path: "{{item}}"
+    loop: "{{nocowDirs}}"
+    register: result
+
+  - name: Disable compression on select directories
+    shell: |
+      decow() {
+        mv "$1" "$1.old_cow"
+        cp -p --attributes-only "$1.old_cow" "$1"
+        chattr +C "$1"
+        cat "$1.old_cow" > "$1"
+        rm "$1.old_cow"
+      }
+      chattr -R +C "{{item.item}}"
+      export -f decow
+      find "{{item.item}}" ! -type l -exec lsattr -d {} + | grep -e '^[^C]* ' | cut -f2 -d ' ' \
+      | xargs -I{} bash -c 'decow "$@"' _ {}
+    args:
+      executable: /bin/bash
+    when: not 'C' in item.stat.attr_flags
+    loop: "{{result.results}}"
+
+  #- name: Disable compression on select directories
+  #  file:
+  #    path: "{{ item.item }}"
+  #    state: directory
+  #    attr: +C
+  #  when: item.stat.exists
+  #  loop: "{{result.results}}"
+
+  # Create a find statement that will locate all compressed files and convert them to +C by copying them

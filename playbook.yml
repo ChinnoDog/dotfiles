@@ -67,6 +67,10 @@
       # cli
       - atop
       - octave
+      - btrfs-compsize
+      - build-essential
+      - curl
+      - vim
       # gui
       - gimp
       - inkscape
