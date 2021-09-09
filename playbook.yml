@@ -11,9 +11,10 @@
     changed_when: false
 
   - name: Import helm key
-    apt_key:
+    get_url:
       url: https://baltocdn.com/helm/signing.asc
-
+      dest: /etc/apt/trusted.gpg.d/helm.asc
+      
   - name: Add helm repo
     apt_repository:
       repo: deb https://baltocdn.com/helm/stable/debian/ all main
@@ -26,8 +27,9 @@
       filename: keepassxc
 
   - name: Add Atom gpg key
-    apt_key:
+    get_url:
       url: https://packagecloud.io/AtomEditor/atom/gpgkey
+      dest: /etc/apt/trusted.gpg.d/atom.asc
 
   - name: Add Atom PPA
     apt_repository:
@@ -36,8 +38,9 @@
       update_cache: false
 
   - name: Add Multisystem key
-    apt_key:
+    get_url:
       url: http://liveusb.info/multisystem/depot/multisystem.asc
+      dest: /etc/apt/trusted.gpg.d/multisystem.asc
 
   - name: Add multisystem PPA
     apt_repository:
