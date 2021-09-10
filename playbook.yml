@@ -60,7 +60,7 @@
   - name: Update and upgrade packages
     apt:
       name: "*"
-      update_cache: true
+      cache_valid_time: "{{ 60*60*6 }}"
       state: latest
 
   - name: Install packages
@@ -98,6 +98,7 @@
       - spotify
       - multipass
       - canonical-livepatch
+      - xmind
 
   - name: Add flathub remote
     flatpak_remote:
