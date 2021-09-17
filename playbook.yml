@@ -1,6 +1,7 @@
 ---
 - name: Configure Ubuntu Laptop
-  hosts: all
+  hosts: localhost
+  connection: local
   become: true
   vars:
 
@@ -71,7 +72,7 @@
       - flatpak
       - flatpak-builder
       # Needed for dropbox
-      - python3-gpg
+      # - python3-gpg
       # cli
       - atop
       - octave
@@ -79,6 +80,7 @@
       - build-essential
       - curl
       - vim
+      - trezor
       # gui
       - gimp
       - inkscape
@@ -86,6 +88,7 @@
       - atom
       - virtualbox
       - multisystem
+      - nautilus-dropbox
       # Display decorations
       - gnome-tweaks
       - solaar
@@ -120,10 +123,6 @@
     - com.slack.Slack
     - com.discordapp.Discord
     #- com.spotify.Client
-
-  - name: Install Dropbox
-    apt:
-      deb: https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2020.03.04_amd64.deb
 
   - name: Install Shadow.tech
     get_url:
