@@ -71,6 +71,7 @@
       - apt-transport-https
       - flatpak
       - flatpak-builder
+      - lm-sensors
       # Needed for dropbox
       # - python3-gpg
       # cli
@@ -81,6 +82,8 @@
       - curl
       - vim
       - trezor
+      - tmux
+      - tmuxp
       # gui
       - gimp
       - inkscape
@@ -89,6 +92,8 @@
       - virtualbox
       - multisystem
       - nautilus-dropbox
+      - steam
+      - gparted
       # Display decorations
       - gnome-tweaks
       - solaar
@@ -132,3 +137,16 @@
 
   #- name: Enable livepatch
   #  shell: canonical-livepatch enable 
+
+  - name: Get current shell extensions
+    shell: gnome-extensions list
+    register: result
+    become: false
+    changed_when: false
+
+  - name: Enable gnome shell extensions
+    shell: "gnome-extensions enable {{item}}"
+    when: item not in result.stdout_lines
+    loop:
+    - system-monitor@paradoxxx.zero.gmail.com 
+    become: false
