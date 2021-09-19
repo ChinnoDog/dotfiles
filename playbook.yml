@@ -167,10 +167,15 @@
   #- name: Enable livepatch
   #  shell: canonical-livepatch enable 
 
+- name: Configure user profile
+  hosts: localhost
+  connection: local
+  become: false
+  tasks:
+
   - name: Get current shell extensions
     shell: gnome-extensions list
     register: result
-    become: false
     changed_when: false
 
   - name: Enable gnome shell extensions
@@ -178,4 +183,33 @@
     when: item not in result.stdout_lines
     loop:
     - system-monitor@paradoxxx.zero.gmail.com 
-    become: false
+
+  - name: Configure Gnome shell folders
+    lineinfile:
+      line: "{{ item }}"
+      regexp: "^{{ item.split('=')[0] }}=.*$"
+      path: "{{ ansible_env.HOME }}/.config/user-dirs.dirs"
+    loop:
+    - 'XDG_TEMPLATES_DIR="$HOME/Dropbox/Templates"'
+    - 'XDG_DOCUMENTS_DIR="$HOME/Dropbox/Documents"'
+    - 'XDG_MUSIC_DIR="$HOME/Dropbox/Music"'
+    - 'XDG_PICTURES_DIR="$HOME/Dropbox/Pictures"'
+    - 'XDG_VIDEOS_DIR="$HOME/Dropbox/Videos"'
+    register: result
+
+  - name: Activate Gnome shell folders
+    shell: xdg-user-dirs-update
+    when: result.changed
+
+  # This will probably delete the shell folders even if they have contents!
+  - name: Delete unused shell folder directories
+    file:
+      path: "{{ ansible_env.HOME }}/{{ item }}"
+      state: absent
+      recurse: false
+    loop:
+      - Templates
+      - Documents
+      - Music
+      - Pictures
+      - Videos
