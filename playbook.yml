@@ -58,20 +58,47 @@
   #    repo: deb https://linux.dropbox.com/ubuntu groovy main
   #    filename: dropbox-official
 
+  - name: Add Chrome gpg key
+    get_url:
+      url: https://dl.google.com/linux/linux_signing_key.pub
+      dest: /etc/apt/trusted.gpg.d/chrome.asc
+
+  #- name: Add Chrome PPA
+  #  apt_repository:
+  #    repo: deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main
+  #    filename: chrome
+
+  - name: Add winehq gpg key
+    get_url:
+      url: https://dl.winehq.org/wine-builds/winehq.key
+      dest: /etc/apt/trusted.gpg.d/winehq.asc
+
+  - name: Add winehq ppa
+    apt_repository:
+      repo: "deb https://dl.winehq.org/wine-builds/ubuntu/ {{ansible_distribution_release}} main"
+      filename: winehq
+
   - name: Update and upgrade packages
     apt:
       name: "*"
       cache_valid_time: "{{ 60*60*6 }}"
       state: latest
 
+  - name: Install Evernote
+    apt:
+      deb: https://cdn1.evernote.com/boron/linux/builds/Evernote-10.7.6-linux-ddl-ga-2321.deb
+
   - name: Install packages
     apt:
+      install_recommends: true
       name:
       # prereq
       - apt-transport-https
       - flatpak
       - flatpak-builder
       - lm-sensors
+      - winehq-stable
+      - mono-complete
       # Needed for dropbox
       # - python3-gpg
       # cli
@@ -95,6 +122,7 @@
       - nautilus-dropbox
       - steam
       - gparted
+      - google-chrome-stable
       # Display decorations
       - gnome-tweaks
       - solaar
