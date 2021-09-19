@@ -84,6 +84,7 @@
       - trezor
       - tmux
       - tmuxp
+      - zstd
       # gui
       - gimp
       - inkscape
