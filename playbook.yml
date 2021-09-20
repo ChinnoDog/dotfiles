@@ -78,15 +78,25 @@
       repo: "deb https://dl.winehq.org/wine-builds/ubuntu/ {{ansible_distribution_release}} main"
       filename: winehq
 
+  - name: Add Hashicorp gpg key
+    get_url:
+      url: https://apt.releases.hashicorp.com/gpg
+      dest: /etc/apt/trusted.gpg.d/hashicorp.asc
+
+  - name: Add Hashicorp PPA
+    apt_repository:
+      repo: 'deb [arch=amd64] https://apt.releases.hashicorp.com {{ansible_distribution_release}} main'
+      filename: hashicorp
+
   - name: Update and upgrade packages
     apt:
       name: "*"
       cache_valid_time: "{{ 60*60*6 }}"
       state: latest
 
-  - name: Install Evernote
-    apt:
-      deb: https://cdn1.evernote.com/boron/linux/builds/Evernote-10.7.6-linux-ddl-ga-2321.deb
+  #- name: Install Evernote
+  #  apt:
+  #    deb: https://cdn1.evernote.com/boron/linux/builds/Evernote-10.7.6-linux-ddl-ga-2321.deb
 
   - name: Install packages
     apt:
@@ -112,6 +122,7 @@
       - tmux
       - tmuxp
       - zstd
+      - vagrant
       # gui
       - gimp
       - inkscape
@@ -136,6 +147,10 @@
       - multipass
       - canonical-livepatch
       - xmind
+
+  - name: Apply apparmor band-aid for Sptify
+    shell: snap connect spotify:network-manager-observe :network-manager-observe
+    changed_when: false
 
   - name: Add flathub remote
     flatpak_remote:
