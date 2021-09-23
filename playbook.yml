@@ -88,6 +88,11 @@
       repo: 'deb [arch=amd64] https://apt.releases.hashicorp.com {{ansible_distribution_release}} main'
       filename: hashicorp
 
+  - name: Add timeshift ppa
+    apt_repository:
+      repo: ppa:teejee2008/timeshift
+      filename: timeshift
+
   - name: Update and upgrade packages
     apt:
       name: "*"
@@ -122,6 +127,7 @@
       - tmux
       - tmuxp
       - zstd
+      - p7zip-full
       - vagrant
       # gui
       - gimp
@@ -134,6 +140,7 @@
       - steam
       - gparted
       - google-chrome-stable
+      - timeshift
       # Display decorations
       - gnome-tweaks
       - solaar
