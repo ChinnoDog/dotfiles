@@ -141,6 +141,7 @@
       - gparted
       - google-chrome-stable
       - timeshift
+      - virt-manager
       # Display decorations
       - gnome-tweaks
       - solaar
@@ -180,11 +181,20 @@
     - com.discordapp.Discord
     #- com.spotify.Client
 
+  - name: Additional flatpak permissions
+    shell: flatpak override net.ankiweb.Anki --filesystem=home
+
   - name: Install Shadow.tech
     get_url:
       url: https://update.shadow.tech/launcher/prod/linux/ubuntu_18.04/Shadow.AppImage
       dest: /opt/Shadow.AppImage
       mode: 0755
+
+  - name: Increase inotify limit for dropbox
+    lineinfile:
+      path: /etc/sysctl.conf
+      line: fs.inotify.max_user_watches=300000
+      regexp: '^fs.inotify.max_user_watches='
 
   #- name: Enable livepatch
   #  shell: canonical-livepatch enable 
@@ -235,3 +245,4 @@
       - Music
       - Pictures
       - Videos
+
