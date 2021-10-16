@@ -7,6 +7,8 @@
 
   pre_tasks:
 
+  # TODO: Move partner repo to its own file because it doesn't have the repos below
+
   - name: Enable extra Ubuntu repos
     shell: apt-add-repository -y -n main universe restricted multiverse
     changed_when: false
@@ -103,6 +105,20 @@
   #  apt:
   #    deb: https://cdn1.evernote.com/boron/linux/builds/Evernote-10.7.6-linux-ddl-ga-2321.deb
 
+  - name: Add Github gpg key
+    shell: >
+      curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+      | sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+    args:
+      creates: /usr/share/keyrings/githubcli-archive-keyring.gpg
+
+  - name: Add github ppa
+    shell: >
+      echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+      | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+    args:
+      creates: /etc/apt/sources.list.d/github-cli.list
+
   - name: Install packages
     apt:
       install_recommends: true
@@ -129,6 +145,7 @@
       - zstd
       - p7zip-full
       - vagrant
+      - gh
       # gui
       - gimp
       - inkscape
