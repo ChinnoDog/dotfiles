@@ -16,3 +16,6 @@ set listchars=tab:T>
 " Prevent modifying a readonly file
 " See: https://vi.stackexchange.com/questions/3455/blocking-changes-to-read-only-file#10248
 autocmd BufRead * let &l:modifiable = !&readonly
+
+" Make sure colors are right in tmux
+set background=dark
