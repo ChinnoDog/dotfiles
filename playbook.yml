@@ -9,9 +9,9 @@
 
   # TODO: Move partner repo to its own file because it doesn't have the repos below
 
-  - name: Enable extra Ubuntu repos
-    shell: apt-add-repository -y -n main universe restricted multiverse
-    changed_when: false
+  #- name: Enable extra Ubuntu repos
+  #  shell: apt-add-repository -y -n main universe restricted multiverse
+  #  changed_when: false
 
   - name: Import helm key
     get_url:
@@ -24,10 +24,12 @@
       filename: helm-stable-debian
       update_cache: false
 
-  - name: Add KeePassXC PPA
-    apt_repository:
-      repo: ppa:phoerious/keepassxc
-      filename: keepassxc
+  # Not yet available for impish
+  # See: https://launchpad.net/~phoerious/+archive/ubuntu/keepassxc
+  #- name: Add KeePassXC PPA
+  #  apt_repository:
+  #    repo: ppa:phoerious/keepassxc
+  #    filename: keepassxc
 
   - name: Add Atom gpg key
     get_url:
@@ -75,10 +77,12 @@
       url: https://dl.winehq.org/wine-builds/winehq.key
       dest: /etc/apt/trusted.gpg.d/winehq.asc
 
-  - name: Add winehq ppa
-    apt_repository:
-      repo: "deb https://dl.winehq.org/wine-builds/ubuntu/ {{ansible_distribution_release}} main"
-      filename: winehq
+  # PPA for newest release not always available. 
+  # Check this page: https://wiki.winehq.org/Ubuntu
+  #- name: Add winehq ppa
+  #  apt_repository:
+  #    repo: "deb https://dl.winehq.org/wine-builds/ubuntu/ {{ansible_distribution_release}} main"
+  #    filename: winehq
 
   - name: Add Hashicorp gpg key
     get_url:
@@ -94,12 +98,6 @@
     apt_repository:
       repo: ppa:teejee2008/timeshift
       filename: timeshift
-
-  - name: Update and upgrade packages
-    apt:
-      name: "*"
-      cache_valid_time: "{{ 60*60*6 }}"
-      state: latest
 
   #- name: Install Evernote
   #  apt:
@@ -119,6 +117,17 @@
     args:
       creates: /etc/apt/sources.list.d/github-cli.list
 
+  - name: Add ratbagd ppa
+    apt_repository:
+      repo: ppa:libratbag-piper/piper-libratbag-git
+      filename: ratbagd
+
+  - name: Update and upgrade packages
+    apt:
+      name: "*"
+      cache_valid_time: "{{ 60*60*6 }}"
+      state: latest
+
   - name: Install packages
     apt:
       install_recommends: true
@@ -130,6 +139,8 @@
       - lm-sensors
       - winehq-stable
       - mono-complete
+      # used by ansible conf module
+      - python3-psutil
       # Needed for dropbox
       # - python3-gpg
       # cli
@@ -146,6 +157,9 @@
       - p7zip-full
       - vagrant
       - gh
+      - powertop
+      - winetricks
+      - ratbagd
       # gui
       - gimp
       - inkscape
@@ -159,11 +173,19 @@
       - google-chrome-stable
       - timeshift
       - virt-manager
+      - torbrowser-launcher
+      - firefox
       # Display decorations
       - gnome-tweaks
       - solaar
       - gnome-shell-extensions
       - gnome-shell-extension-system-monitor
+
+  - name: Remove snaps
+    snap:
+      name:
+      - firefox
+      state: absent
 
   - name: Install snaps
     snap:
@@ -196,6 +218,7 @@
     - com.axosoft.GitKraken 
     - com.slack.Slack
     - com.discordapp.Discord
+    - org.kde.okular
     #- com.spotify.Client
 
   - name: Additional flatpak permissions
@@ -263,3 +286,7 @@
       - Pictures
       - Videos
 
+  - name: Make calendar notifications only appear in tray
+    dconf:
+      key: /org/gnome/evolution-data-server/calendar/notify-with-tray
+      value: "true"
