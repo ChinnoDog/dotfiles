@@ -19,3 +19,13 @@ autocmd BufRead * let &l:modifiable = !&readonly
 
 " Make sure colors are right in tmux
 set background=dark
+
+" Jump to last known position in file 
+if has("autocmd")
+  au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+endif
+
+" Syntax highlighting by default
+if has("syntax")
+  syntax on
+endif
