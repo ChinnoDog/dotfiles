@@ -117,10 +117,10 @@
     args:
       creates: /etc/apt/sources.list.d/github-cli.list
 
-  - name: Add ratbagd ppa
-    apt_repository:
-      repo: ppa:libratbag-piper/piper-libratbag-git
-      filename: ratbagd
+  #- name: Add ratbagd ppa
+  #  apt_repository:
+  #    repo: ppa:libratbag-piper/piper-libratbag-git
+  #    filename: ratbagd
 
   - name: Update and upgrade packages
     apt:
@@ -159,7 +159,9 @@
       - gh
       - powertop
       - winetricks
-      - ratbagd
+      - logiops
+      - colortest
+      # - ratbagd
       # gui
       - gimp
       - inkscape

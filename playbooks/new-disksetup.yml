@@ -1,0 +1,95 @@
+---
+- name: Disk setup
+  hosts: all
+  become: true
+  vars:
+    nocowDirs:
+    - /swap
+    - /var/cache/apt/archives
+    - /var/lib/snapd
+    defMountOpts:
+    - defaults
+    - noatime
+    - compress-force=zstd:7
+    - discard
+  tasks:
+
+  - name: Create subvols directory
+    file:
+      path: /subvols
+      state: directory
+      mode: '0701'
+      owner: root
+
+  - name: Mount btrfs root to subvols
+    mount:
+      src: /dev/mapper/cryptssd
+      path: /subvols
+      fstype: btrfs
+      opts: "{{ defMountOpts|join(',') }}"
+      state: mounted
+
+  - name: Create swap subvol
+    shell: btrfs subvolume create /subvols/@swap
+    args:
+      creates: /subvols/@swap
+
+  - name: Create swap directory
+    file:
+      path: /swap
+      state: directory
+      mode: '0701'
+      owner: root
+
+  - name: Mount the swap volume
+    mount:
+      src: /dev/mapper/cryptssd
+      path: /swap
+      fstype: btrfs
+      opts: defaults,noatime,subvol=@swap
+      state: mounted
+
+  - name: Create the swapfile
+    shell: |
+      truncate -s 0 swapfile
+      btrfs property set ./swapfile compression none
+      chmod 600 swapfile
+      dd if=/dev/zero of=swapfile bs=64M count={{(ansible_memtotal_mb/64)|round(0,'ceil')|int}}
+      mkswap swapfile
+    args:
+      creates: swapfile
+      chdir: /swap
+
+  - name: Mount the swap file
+    mount:
+      src: /swap/swapfile
+      path: none
+      fstype: swap
+      opts: defaults
+      state: present
+
+
+#  - name: Check for nocow directories
+#    stat:
+#      path: "{{item}}"
+#    loop: "{{nocowDirs}}"
+#    register: result
+#
+#  - name: Disable compression on select directories
+#    shell: |
+#      decow() {
+#        mv "$1" "$1.old_cow"
+#        cp -p --attributes-only "$1.old_cow" "$1"
+#        chattr +C "$1"
+#        cat "$1.old_cow" > "$1"
+#        rm "$1.old_cow"
+#      }
+#      chattr -R +C "{{item.item}}"
+#      export -f decow
+#      find "{{item.item}}" ! -type l -exec lsattr -d {} + | grep -e '^[^C]* ' | cut -f2 -d ' ' \
+#      | xargs -I{} bash -c 'decow "$@"' _ {}
+#    args:
+#      executable: /bin/bash
+#    when: not 'C' in item.stat.attr_flags
+#    loop: "{{result.results}}"
+#
