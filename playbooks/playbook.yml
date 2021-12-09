@@ -1,0 +1,292 @@
+---
+- name: Configure Ubuntu Laptop
+  hosts: localhost
+  connection: local
+  become: true
+  vars:
+
+  pre_tasks:
+
+  # TODO: Move partner repo to its own file because it doesn't have the repos below
+
+  #- name: Enable extra Ubuntu repos
+  #  shell: apt-add-repository -y -n main universe restricted multiverse
+  #  changed_when: false
+
+  - name: Import helm key
+    get_url:
+      url: https://baltocdn.com/helm/signing.asc
+      dest: /etc/apt/trusted.gpg.d/helm.asc
+      
+  - name: Add helm repo
+    apt_repository:
+      repo: deb https://baltocdn.com/helm/stable/debian/ all main
+      filename: helm-stable-debian
+      update_cache: false
+
+  # Not yet available for impish
+  # See: https://launchpad.net/~phoerious/+archive/ubuntu/keepassxc
+  #- name: Add KeePassXC PPA
+  #  apt_repository:
+  #    repo: ppa:phoerious/keepassxc
+  #    filename: keepassxc
+
+  - name: Add Atom gpg key
+    get_url:
+      url: https://packagecloud.io/AtomEditor/atom/gpgkey
+      dest: /etc/apt/trusted.gpg.d/atom.asc
+
+  - name: Add Atom PPA
+    apt_repository:
+      repo: deb [arch=amd64] https://packagecloud.io/AtomEditor/atom/any/ any main
+      filename: atom
+      update_cache: false
+
+  - name: Add Multisystem key
+    get_url:
+      url: http://liveusb.info/multisystem/depot/multisystem.asc
+      dest: /etc/apt/trusted.gpg.d/multisystem.asc
+
+  - name: Add multisystem PPA
+    apt_repository:
+      repo: deb http://liveusb.info/multisystem/depot all main
+      filename: multisystem
+
+  #- name: Add Dropbox key
+  #  apt_key:
+  #    keyserver: pool.sks-keyservers.net
+  #    id: 1C61A2656FB57B7E4DE0F4C1FC918B335044912E
+
+  #- name: Add Dropbox repository
+  #  apt_repository:
+  #    repo: deb https://linux.dropbox.com/ubuntu groovy main
+  #    filename: dropbox-official
+
+  - name: Add Chrome gpg key
+    get_url:
+      url: https://dl.google.com/linux/linux_signing_key.pub
+      dest: /etc/apt/trusted.gpg.d/chrome.asc
+
+  #- name: Add Chrome PPA
+  #  apt_repository:
+  #    repo: deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main
+  #    filename: chrome
+
+  - name: Add winehq gpg key
+    get_url:
+      url: https://dl.winehq.org/wine-builds/winehq.key
+      dest: /etc/apt/trusted.gpg.d/winehq.asc
+
+  # PPA for newest release not always available. 
+  # Check this page: https://wiki.winehq.org/Ubuntu
+  #- name: Add winehq ppa
+  #  apt_repository:
+  #    repo: "deb https://dl.winehq.org/wine-builds/ubuntu/ {{ansible_distribution_release}} main"
+  #    filename: winehq
+
+  - name: Add Hashicorp gpg key
+    get_url:
+      url: https://apt.releases.hashicorp.com/gpg
+      dest: /etc/apt/trusted.gpg.d/hashicorp.asc
+
+  - name: Add Hashicorp PPA
+    apt_repository:
+      repo: 'deb [arch=amd64] https://apt.releases.hashicorp.com {{ansible_distribution_release}} main'
+      filename: hashicorp
+
+  - name: Add timeshift ppa
+    apt_repository:
+      repo: ppa:teejee2008/timeshift
+      filename: timeshift
+
+  #- name: Install Evernote
+  #  apt:
+  #    deb: https://cdn1.evernote.com/boron/linux/builds/Evernote-10.7.6-linux-ddl-ga-2321.deb
+
+  - name: Add Github gpg key
+    shell: >
+      curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+      | sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+    args:
+      creates: /usr/share/keyrings/githubcli-archive-keyring.gpg
+
+  - name: Add github ppa
+    shell: >
+      echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+      | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+    args:
+      creates: /etc/apt/sources.list.d/github-cli.list
+
+  - name: Add ratbagd ppa
+    apt_repository:
+      repo: ppa:libratbag-piper/piper-libratbag-git
+      filename: ratbagd
+
+  - name: Update and upgrade packages
+    apt:
+      name: "*"
+      cache_valid_time: "{{ 60*60*6 }}"
+      state: latest
+
+  - name: Install packages
+    apt:
+      install_recommends: true
+      name:
+      # prereq
+      - apt-transport-https
+      - flatpak
+      - flatpak-builder
+      - lm-sensors
+      - winehq-stable
+      - mono-complete
+      # used by ansible conf module
+      - python3-psutil
+      # Needed for dropbox
+      # - python3-gpg
+      # cli
+      - atop
+      - octave
+      - btrfs-compsize
+      - build-essential
+      - curl
+      - vim
+      - trezor
+      - tmux
+      - tmuxp
+      - zstd
+      - p7zip-full
+      - vagrant
+      - gh
+      - powertop
+      - winetricks
+      - ratbagd
+      # gui
+      - gimp
+      - inkscape
+      - keepassxc
+      - atom
+      - virtualbox
+      - multisystem
+      - nautilus-dropbox
+      - steam
+      - gparted
+      - google-chrome-stable
+      - timeshift
+      - virt-manager
+      - torbrowser-launcher
+      - firefox
+      # Display decorations
+      - gnome-tweaks
+      - solaar
+      - gnome-shell-extensions
+      - gnome-shell-extension-system-monitor
+
+  - name: Remove snaps
+    snap:
+      name:
+      - firefox
+      state: absent
+
+  - name: Install snaps
+    snap:
+      name:
+      - spotify
+      - multipass
+      - canonical-livepatch
+      - xmind
+
+  - name: Apply apparmor band-aid for Sptify
+    shell: snap connect spotify:network-manager-observe :network-manager-observe
+    changed_when: false
+
+  - name: Add flathub remote
+    flatpak_remote:
+      name: flathub
+      flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+
+  - name: Install flatpaks
+    flatpak:
+      name: "{{item}}"
+    with_items:
+    #- com.axosoft.GitKraken
+    - com.calibre_ebook.calibre
+    - com.jetbrains.PyCharm-Community
+    - net.ankiweb.Anki
+    - net.sourceforge.ExtremeTuxRacer
+    - org.kde.digikam
+    - us.zoom.Zoom
+    - com.axosoft.GitKraken 
+    - com.slack.Slack
+    - com.discordapp.Discord
+    - org.kde.okular
+    #- com.spotify.Client
+
+  - name: Additional flatpak permissions
+    shell: flatpak override net.ankiweb.Anki --filesystem=home
+
+  - name: Install Shadow.tech
+    get_url:
+      url: https://update.shadow.tech/launcher/prod/linux/ubuntu_18.04/Shadow.AppImage
+      dest: /opt/Shadow.AppImage
+      mode: 0755
+
+  - name: Increase inotify limit for dropbox
+    lineinfile:
+      path: /etc/sysctl.conf
+      line: fs.inotify.max_user_watches=300000
+      regexp: '^fs.inotify.max_user_watches='
+
+  #- name: Enable livepatch
+  #  shell: canonical-livepatch enable 
+
+- name: Configure user profile
+  hosts: localhost
+  connection: local
+  become: false
+  tasks:
+
+  - name: Get current shell extensions
+    shell: gnome-extensions list
+    register: result
+    changed_when: false
+
+  - name: Enable gnome shell extensions
+    shell: "gnome-extensions enable {{item}}"
+    when: item not in result.stdout_lines
+    loop:
+    - system-monitor@paradoxxx.zero.gmail.com 
+
+  - name: Configure Gnome shell folders
+    lineinfile:
+      line: "{{ item }}"
+      regexp: "^{{ item.split('=')[0] }}=.*$"
+      path: "{{ ansible_env.HOME }}/.config/user-dirs.dirs"
+    loop:
+    - 'XDG_TEMPLATES_DIR="$HOME/Dropbox/Templates"'
+    - 'XDG_DOCUMENTS_DIR="$HOME/Dropbox/Documents"'
+    - 'XDG_MUSIC_DIR="$HOME/Dropbox/Music"'
+    - 'XDG_PICTURES_DIR="$HOME/Dropbox/Pictures"'
+    - 'XDG_VIDEOS_DIR="$HOME/Dropbox/Videos"'
+    register: result
+
+  - name: Activate Gnome shell folders
+    shell: xdg-user-dirs-update
+    when: result.changed
+
+  # This will probably delete the shell folders even if they have contents!
+  - name: Delete unused shell folder directories
+    file:
+      path: "{{ ansible_env.HOME }}/{{ item }}"
+      state: absent
+      recurse: false
+    loop:
+      - Templates
+      - Documents
+      - Music
+      - Pictures
+      - Videos
+
+  - name: Make calendar notifications only appear in tray
+    dconf:
+      key: /org/gnome/evolution-data-server/calendar/notify-with-tray
+      value: "true"

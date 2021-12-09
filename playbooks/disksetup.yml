@@ -1,0 +1,135 @@
+---
+- name: Tune performance
+  hosts: all
+  become: true
+  vars:
+    aptArchiveDir: /subvols/hdd/@system/apt-archives
+    nocowDirs:
+    - "{{aptArchiveDir}}"
+    - /var/lib/snapd
+  tasks:
+
+  - name: Create subvol dirs
+    file:
+      path: "{{item}}"
+      state: directory
+    loop:
+    - /subvols
+    - /subvols/ssd
+    - /subvols/hdd
+
+  - name: Configure btrfs mounts
+    mount:
+      src: "{{ item.src }}"
+      path: "{{ item.path }}"
+      fstype: btrfs
+      opts: "{{ item.opts | join(',') }}"
+      state: mounted
+    loop:
+    - src: /dev/mapper/cryptssd
+      path: /
+      opts:
+      - defaults
+      - noatime
+      - compress-force=zstd:7
+      - subvol=@
+      - ssd
+      - discard
+    - src: /dev/mapper/cryptssd
+      path: /subvols/ssd
+      opts:
+      - defaults
+      - noatime
+      - compress-force=zstd:7
+      - ssd
+      - discard
+    - src: /dev/mapper/crypthdd
+      path: /subvols/hdd
+      opts:
+      - defaults
+      - noatime
+      - compress-force=zstd:7
+
+  - name: Create subvolumes
+    shell: "btrfs subvolume create /subvols/{{item}}"
+    args:
+      creates: "/subvols/{{item}}"
+    loop:
+    - hdd/@system
+    - hdd/@dropbox
+    - hdd/@swap
+
+  - name: Mark swap subvol as nocow
+    file:
+      path: "/subvols/hdd/@swap"
+      state: directory
+      attr: +C
+
+  - name: Create the swapfile
+    shell: |
+      truncate -s 0 swapfile
+      btrfs property set ./swapfile compression none
+      chmod 600 swapfile
+      dd if=/dev/zero of=swapfile bs=64M count={{(ansible_memtotal_mb/64)|round(0,'ceil')|int}}
+      mkswap swapfile
+    args:
+      creates: swapfile
+      chdir: /subvols/hdd/@swap/
+
+  - name: Move the apt archive directory
+    shell: "mv /var/cache/apt/archives {{aptArchiveDir}}"
+    args:
+      creates: "{{aptArchiveDir}}"
+
+  - name: configure alternate apt archive directory
+    file:
+      path: "{{aptArchiveDir}}"
+      state: directory
+      mode: 0755
+      owner: root
+      group: root
+
+  - name: Configure apt to use alternate archive dir
+    copy:
+      dest: /etc/apt/apt.conf.d/99alt-cache
+      content: |
+        # Added by SRN
+        Dir::Cache::Archives "{{aptArchiveDir}}/";
+        
+        # Work around bug that prevents apt saving packages
+        # See: https://askubuntu.com/questions/897513/apt-command-does-not-cache-the-deb-files
+        Binary::apt::APT::Keep-Downloaded-Packages "true";
+
+  - name: Check for nocow directories
+    stat:
+      path: "{{item}}"
+    loop: "{{nocowDirs}}"
+    register: result
+
+  - name: Disable compression on select directories
+    shell: |
+      decow() {
+        mv "$1" "$1.old_cow"
+        cp -p --attributes-only "$1.old_cow" "$1"
+        chattr +C "$1"
+        cat "$1.old_cow" > "$1"
+        rm "$1.old_cow"
+      }
+      chattr -R +C "{{item.item}}"
+      export -f decow
+      find "{{item.item}}" ! -type l -exec lsattr -d {} + | grep -e '^[^C]* ' | cut -f2 -d ' ' \
+      | xargs -I{} bash -c 'decow "$@"' _ {}
+    args:
+      executable: /bin/bash
+    when: not 'C' in item.stat.attr_flags
+    loop: "{{result.results}}"
+
+  #- name: Disable compression on select directories
+  #  file:
+  #    path: "{{ item.item }}"
+  #    state: directory
+  #    attr: +C
+  #  when: item.stat.exists
+  #  loop: "{{result.results}}"
+
+  # Create a find statement that will locate all compressed files and convert them to +C by copying them
