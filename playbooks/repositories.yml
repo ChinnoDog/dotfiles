@@ -1,0 +1,30 @@
+---
+- name: Manage git repositories
+  hosts: localhost
+  connection: local
+  become: false
+  module_defaults:
+    git:
+      update: no
+  vars:
+    remote_regex: '((git|ssh|http(s)?)|(git@[\w\.]+))(:(//)?)([\w\.@\:\-~]+/)*([\w\.@\:\-~]+).git'
+    repos:
+      - git@github.com:ChinnoDog/chinnodog.github.io.git
+      - git@github.com:kodekloudhub/certified-kubernetes-administrator-course.git
+  tasks:
+
+  - name: Check out repos
+    git:
+      repo: "{{item}}"
+      dest: "~/repositories/{{ item | regex_search(remote_regex, '\\8') | first }}"
+    loop: "{{repos}}"
+
+  #- name: Github pages repo
+  #  git:
+  #    repo: git@github.com:ChinnoDog/chinnodog.github.io.git
+  #    dest: ~/repositories/chinnodog.github.io
+
+  #- name: Kodecloud cka repo
+  #  git:
+  #    repo: git@github.com:kodekloudhub/certified-kubernetes-administrator-course.git
+  #    dest: ~/repositories/certified-kubernetes-administrator-course
