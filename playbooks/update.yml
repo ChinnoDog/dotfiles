@@ -1,0 +1,13 @@
+---
+- name: Update and upgrade everything
+  hosts: localhost
+  connection: local
+  become: true
+  tasks:
+
+  - name: Update and upgrade packages
+    apt:
+      name: "*"
+      cache_valid_time: "{{ 60*60*6 }}"
+      state: latest
+

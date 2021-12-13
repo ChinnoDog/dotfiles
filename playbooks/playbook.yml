@@ -122,12 +122,6 @@
   #    repo: ppa:libratbag-piper/piper-libratbag-git
   #    filename: ratbagd
 
-  - name: Update and upgrade packages
-    apt:
-      name: "*"
-      cache_valid_time: "{{ 60*60*6 }}"
-      state: latest
-
   - name: Install packages
     apt:
       install_recommends: true
@@ -224,7 +218,9 @@
     #- com.spotify.Client
 
   - name: Additional flatpak permissions
+    # This command is idempotent and always returns 0
     shell: flatpak override net.ankiweb.Anki --filesystem=home
+    changed_when: false
 
   - name: Install Shadow.tech
     get_url:
