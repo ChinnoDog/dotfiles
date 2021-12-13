@@ -13,6 +13,17 @@
       - src: git@github.com:kodekloudhub/certified-kubernetes-administrator-course.git
       - src: https://github.com/bitnami/charts.git
         name: bitnami-charts
+      - src: git@github.com:scaleway/scaleway-cli.git
+      - src: git@github.com:theforeman/foreman-ansible-modules.git
+      - src: git@github.com:dbader/readme-template.git
+      - src: git@github.com:openshift/okd.git
+      - src: git@github.com:crashvb/docker-sign-verify.git
+      - src: git@github.com:ChinnoDog/docker-registry-client-async.git
+      - src: git@github.com:crashvb/pytest-gnupg-fixtures.git
+      - src: git@gitlab.com:ApprenticeAlf/DeDRM.git
+      - src: git@bitbucket.org:ChinnoDog/testlab.git
+      - src: git@github.com:scottslowe/learning-tools.git
+      - src: git@github.com:ChinnoDog/co1-bap.git
   tasks:
 
   - name: Fork repo checkouts
@@ -23,6 +34,7 @@
     poll: 0
     async: 600
     register: checkout_result
+    changed_when: false
 
   post_tasks:
 
