@@ -9,22 +9,15 @@
   vars:
     remote_regex: '((git|ssh|http(s)?)|(git@[\w\.]+))(:(//)?)([\w\.@\:\-~]+/)*([\w\.@\:\-~]+).git'
     repos:
-      - git@github.com:ChinnoDog/chinnodog.github.io.git
-      - git@github.com:kodekloudhub/certified-kubernetes-administrator-course.git
+      - src: git@github.com:ChinnoDog/chinnodog.github.io.git
+      - src: git@github.com:kodekloudhub/certified-kubernetes-administrator-course.git
+      - src: https://github.com/bitnami/charts.git
+        name: bitnami-charts
   tasks:
 
   - name: Check out repos
     git:
-      repo: "{{item}}"
-      dest: "~/repositories/{{ item | regex_search(remote_regex, '\\8') | first }}"
+      repo: "{{item.src}}"
+      dest: "~/repositories/{{ item.name | default(item.src | regex_search(remote_regex, '\\8') | first) }}"
     loop: "{{repos}}"
 
-  #- name: Github pages repo
-  #  git:
-  #    repo: git@github.com:ChinnoDog/chinnodog.github.io.git
-  #    dest: ~/repositories/chinnodog.github.io
-
-  #- name: Kodecloud cka repo
-  #  git:
-  #    repo: git@github.com:kodekloudhub/certified-kubernetes-administrator-course.git
-  #    dest: ~/repositories/certified-kubernetes-administrator-course
