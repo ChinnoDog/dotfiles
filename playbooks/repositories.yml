@@ -15,9 +15,24 @@
         name: bitnami-charts
   tasks:
 
-  - name: Check out repos
+  - name: Fork repo checkouts
     git:
       repo: "{{item.src}}"
       dest: "~/repositories/{{ item.name | default(item.src | regex_search(remote_regex, '\\8') | first) }}"
     loop: "{{repos}}"
+    poll: 0
+    async: 600
+    register: checkout_result
+
+  post_tasks:
+
+  - name: Wait for repo checkout completion
+    async_status:
+      jid: "{{ item.ansible_job_id }}"
+    register: checkout_jobs
+    retries: "{{ (600 / 5) | int }}"
+    delay: 5
+    until: checkout_jobs.finished
+    loop: "{{ checkout_result.results }}"
+
 
