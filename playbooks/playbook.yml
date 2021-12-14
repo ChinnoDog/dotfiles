@@ -231,7 +231,7 @@
   hosts: localhost
   connection: local
   become: false
-  tasks:
+  pre_tasks:
 
   - name: Get current shell extensions
     shell: gnome-extensions list
@@ -278,6 +278,12 @@
     dconf:
       key: /org/gnome/evolution-data-server/calendar/notify-with-tray
       value: "true"
+
+  - name: Read existing Atom configuration
+    slurp:
+      src: ~chinnodog/.atom/config.cson
+    register: atomconf
+    failed_when: false
 
   roles:
 
