@@ -31,17 +31,6 @@
   #    repo: ppa:phoerious/keepassxc
   #    filename: keepassxc
 
-  - name: Add Atom gpg key
-    get_url:
-      url: https://packagecloud.io/AtomEditor/atom/gpgkey
-      dest: /etc/apt/trusted.gpg.d/atom.asc
-
-  - name: Add Atom PPA
-    apt_repository:
-      repo: deb [arch=amd64] https://packagecloud.io/AtomEditor/atom/any/ any main
-      filename: atom
-      update_cache: false
-
   - name: Add Multisystem key
     get_url:
       url: http://liveusb.info/multisystem/depot/multisystem.asc
@@ -155,12 +144,13 @@
       - winetricks
       - logiops
       - colortest
+      - ansible
+      - ansible-lint
       # - ratbagd
       # gui
       - gimp
       - inkscape
       - keepassxc
-      - atom
       - virtualbox
       - multisystem
       - nautilus-dropbox
@@ -288,3 +278,26 @@
     dconf:
       key: /org/gnome/evolution-data-server/calendar/notify-with-tray
       value: "true"
+
+  roles:
+
+  - role: gantsign.atom
+    users:
+    - username: chinnodog
+      atom_packages:
+      - linter
+      - linter-ansible-linting
+      - atom-beautify
+      - file-icons
+      atom_config:
+        '*':
+          autosave:
+            enabled: true
+          core:
+            telemetryConsent: limited
+          "exception-reporting":
+            userId: 32e40e40-b46c-441e-bde8-953de595332a
+          editor:
+            showIndentGuide: true
+            showInvisibles: true
+      atom_config_overwrite: true
