@@ -307,3 +307,20 @@
             showIndentGuide: true
             showInvisibles: true
       atom_config_overwrite: true
+
+  post_tasks:
+
+  - name: Cron DnD off in the morning
+    cron:
+      name: Turn off Do Not Disturb
+      hour: "08"
+      minute: "00"
+      job: gsettings set org.gnome.desktop.notifications show-banners true
+
+  - name: Cron DnD on at night
+    cron:
+      name: Turn on Do Not Disturb
+      hour: "23"
+      minute: "30"
+      job: gsettings set org.gnome.desktop.notifications show-banners false
+
