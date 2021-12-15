@@ -227,6 +227,42 @@
   #- name: Enable livepatch
   #  shell: canonical-livepatch enable 
 
+  - name: Enable automatic upgrades
+    copy:
+      dest: /etc/apt/apt.conf.d/22auto-upgrades-local
+      content: |
+        // Custom -SRN
+        
+        // Enable update script
+        APT::Periodic::Enable "1";
+        
+        // "apt-get update" every day
+        APT::Periodic::Update-Package-Lists "1";
+        
+        // Don't download before we need them
+        APT::Periodic::Download-Upgradeable-Packages "0";
+        
+        // Run "unattended-upgrade" every day
+        APT::Periodic::Unattended-Upgrade "1";
+        
+        // Delete usleess packages every day
+        APT::Periodic::AutocleanInterval "1";
+
+  - name: Apply automatic upgrade seettings
+    copy:
+      dest: /etc/apt/apt.conf.d/52unattended-upgrades-local
+      content: |
+        // Custom -SRN
+        // Docs: zless /usr/share/doc/unattended-upgrades/README.md.gz
+        
+        Unattended-Upgrade::Origins-Pattern {
+          "origin=*";
+        };
+        Unattended-Upgrade::Remove-Unused-Dependencies "true";
+        Unattended-Upgrade::OnlyOnACPower "true";
+        Unattended-Upgrade::Skip-Updates-On-Metered-Connections "true";
+        
+
 - name: Configure user profile
   hosts: localhost
   connection: local
