@@ -1,2 +1,2 @@
 #!/bin/sh
-until ssh -t -o TCPKeepAlive=yes -o ServerAliveInterval=5 gouda.lonesheep.net tmux new -As0; do echo $(date) Reconnecting... && sleep 5; done
+until ssh -t gouda tmux new -As0; do echo $(date) Reconnecting... && sleep 5; done
