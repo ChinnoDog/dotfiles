@@ -127,6 +127,7 @@
       # Needed for dropbox
       # - python3-gpg
       # cli
+      - tree
       - atop
       - octave
       - btrfs-compsize
@@ -181,9 +182,16 @@
       - canonical-livepatch
       - xmind
 
-  - name: Apply apparmor band-aid for Sptify
+  - name: Apply apparmor band-aid for Spotify
     shell: snap connect spotify:network-manager-observe :network-manager-observe
     changed_when: false
+
+  - name: Remove flatpaks
+    flatpak:
+      name: "{{item}}"
+      state: absent
+    with_items:
+      us.zoom.Zoom
 
   - name: Add flathub remote
     flatpak_remote:
@@ -200,7 +208,6 @@
     - net.ankiweb.Anki
     - net.sourceforge.ExtremeTuxRacer
     - org.kde.digikam
-    - us.zoom.Zoom
     - com.axosoft.GitKraken 
     - com.slack.Slack
     - com.discordapp.Discord
@@ -218,6 +225,23 @@
       dest: /opt/Shadow.AppImage
       mode: 0755
 
+  - name: Install WebEx
+    apt:
+      deb: https://binaries.webex.com/WebexDesktop-Ubuntu-Official-Package/Webex.deb
+
+  - name: Install Windscribe VPN
+    apt:
+      deb: https://deploy-do.windscribe.com/apps/windscribe_2.3.15_beta_amd64.deb
+
+  - name: Install Zoom public key
+    get_url:
+      url: https://zoom.us/linux/download/pubkey
+      dest: /etc/apt/trusted.gpg.d/zoom.asc
+
+  - name: Install zoom
+    apt:
+      deb: https://cdn.zoom.us/prod/5.9.1.1380/zoom_amd64.deb
+
   - name: Increase inotify limit for dropbox
     lineinfile:
       path: /etc/sysctl.conf
@@ -227,7 +251,7 @@
   #- name: Enable livepatch
   #  shell: canonical-livepatch enable 
 
-  - name: Enable automatic upgrades
+  - name: Enable automatic apt upgrades
     copy:
       dest: /etc/apt/apt.conf.d/22auto-upgrades-local
       content: |
@@ -261,7 +285,44 @@
         Unattended-Upgrade::Remove-Unused-Dependencies "true";
         Unattended-Upgrade::OnlyOnACPower "true";
         Unattended-Upgrade::Skip-Updates-On-Metered-Connections "true";
-        
+
+  # Flatpak automatic update from https://www.jwillikers.com/automate-flatpak-updates-with-systemd
+  - name: Systemd service to update system flatpaks
+    copy:
+      dest: /etc/systemd/system/update-system-flatpaks.service
+      content: |
+        [Unit]
+        Description=Update system Flatpaks
+        After=network-online.target
+        Wants=network-online.target
+
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/bin/flatpak --system update -y
+
+        [Install]
+        WantedBy=multi-user.target
+
+  - name: Systemd timers to update flatpaks
+    copy:
+      dest: "/etc/systemd/system/update-system-flatpaks.timer"
+      content: |
+        [Unit]
+        Description=Update system Flatpaks daily
+
+        [Timer]
+        OnCalendar=daily
+        Persistent=true
+
+        [Install]
+        WantedBy=timers.target
+
+  - name: Enable systemd timer to update flatpaks
+    systemd:
+      state: started
+      enabled: true
+      name: "update-system-flatpaks.timer"
+      daemon_reload: yes
 
 - name: Configure user profile
   hosts: localhost
@@ -331,6 +392,8 @@
       - linter-ansible-linting
       - atom-beautify
       - file-icons
+      - markdown-preview-enhanced
+      - vim-mode-plus
       atom_config:
         '*':
           autosave:
@@ -339,6 +402,8 @@
             telemetryConsent: limited
           "exception-reporting":
             userId: 32e40e40-b46c-441e-bde8-953de595332a
+            disabledPackages:
+            - markdown-preview
           editor:
             showIndentGuide: true
             showInvisibles: true
