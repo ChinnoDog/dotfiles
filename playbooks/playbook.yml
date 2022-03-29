@@ -111,9 +111,20 @@
   #    repo: ppa:libratbag-piper/piper-libratbag-git
   #    filename: ratbagd
 
+  - name: Add solaar ppa
+    apt_repository:
+      repo: ppa:solaar-unifying/stable
+      filename: solaar
+
+  - name: Add OBS ppa
+    apt_repository:
+      repo: ppa:obsproject/obs-studio
+      filename: obs-studio
+
   - name: Install packages
     apt:
       install_recommends: true
+      update_cache: true
       name:
       # prereq
       - apt-transport-https
@@ -147,6 +158,7 @@
       - colortest
       - ansible
       - ansible-lint
+      - smartmontools
       # - ratbagd
       # gui
       - gimp
@@ -162,6 +174,10 @@
       - virt-manager
       - torbrowser-launcher
       - firefox
+      - xournal
+      # obs requires v4l2loopback-dkms
+      - v4l2loopback-dkms
+      - obs-studio
       # Display decorations
       - gnome-tweaks
       - solaar
@@ -181,6 +197,7 @@
       - multipass
       - canonical-livepatch
       - xmind
+      - acrordrdc
 
   - name: Apply apparmor band-aid for Spotify
     shell: snap connect spotify:network-manager-observe :network-manager-observe
@@ -214,16 +231,25 @@
     - org.kde.okular
     #- com.spotify.Client
 
-  - name: Additional flatpak permissions
+  - name: Grant flatpak permissions to home dir
     # This command is idempotent and always returns 0
-    shell: flatpak override net.ankiweb.Anki --filesystem=home
+    shell: "flatpak override {{item}} --filesystem=home"
     changed_when: false
+    loop:
+    - net.ankiweb.Anki
+    - com.discordapp.Discord
+    - com.slack.Slack
 
-  - name: Install Shadow.tech
-    get_url:
-      url: https://update.shadow.tech/launcher/prod/linux/ubuntu_18.04/Shadow.AppImage
-      dest: /opt/Shadow.AppImage
-      mode: 0755
+  #- name: Install Shadow.tech
+  #  get_url:
+  #    url: https://update.shadow.tech/launcher/prod/linux/ubuntu_18.04/Shadow.AppImage
+  #    dest: /opt/Shadow.AppImage
+  #    mode: 0755
+  
+  - name: Remove shadow.tech
+    file:
+      path: /opt/Shadow.AppImage
+      state: absent
 
   - name: Install WebEx
     apt:
