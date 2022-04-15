@@ -70,13 +70,17 @@
     - ansible-lint
 
 # This should be in a separate role/playbook because it is not a system config
-- name: git common settings
+- block:
+
+  - name: git common settings
+    git_config:
+      scope: global
+      name: "{{ (item|dict2items)[0].key }}"
+      value: "{{ (item|dict2items)[0].value }}"
+    loop:
+    - user.name: Stephen Nichols
+    - core.editor: vim
+    - commit.gpgsign: "true"
+
+  # block params
   become: false
-  git_config:
-    scope: global
-    name: "{{ (item|dict2items)[0].key }}"
-    value: "{{ (item|dict2items)[0].value }}"
-  loop:
-  - user.name: Stephen Nichols
-  - core.editor: vim
-  
