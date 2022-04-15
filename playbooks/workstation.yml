@@ -7,23 +7,6 @@
 
   pre_tasks:
 
-  # TODO: Move partner repo to its own file because it doesn't have the repos below
-
-  #- name: Enable extra Ubuntu repos
-  #  shell: apt-add-repository -y -n main universe restricted multiverse
-  #  changed_when: false
-
-  - name: Import helm key
-    get_url:
-      url: https://baltocdn.com/helm/signing.asc
-      dest: /etc/apt/trusted.gpg.d/helm.asc
-      
-  - name: Add helm repo
-    apt_repository:
-      repo: deb https://baltocdn.com/helm/stable/debian/ all main
-      filename: helm-stable-debian
-      update_cache: false
-
   # Not yet available for impish
   # See: https://launchpad.net/~phoerious/+archive/ubuntu/keepassxc
   #- name: Add KeePassXC PPA
@@ -73,16 +56,6 @@
   #    repo: "deb https://dl.winehq.org/wine-builds/ubuntu/ {{ansible_distribution_release}} main"
   #    filename: winehq
 
-  - name: Add Hashicorp gpg key
-    get_url:
-      url: https://apt.releases.hashicorp.com/gpg
-      dest: /etc/apt/trusted.gpg.d/hashicorp.asc
-
-  - name: Add Hashicorp PPA
-    apt_repository:
-      repo: 'deb [arch=amd64] https://apt.releases.hashicorp.com {{ansible_distribution_release}} main'
-      filename: hashicorp
-
   - name: Add timeshift ppa
     apt_repository:
       repo: ppa:teejee2008/timeshift
@@ -91,20 +64,6 @@
   #- name: Install Evernote
   #  apt:
   #    deb: https://cdn1.evernote.com/boron/linux/builds/Evernote-10.7.6-linux-ddl-ga-2321.deb
-
-  - name: Add Github gpg key
-    shell: >
-      curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
-      | sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
-    args:
-      creates: /usr/share/keyrings/githubcli-archive-keyring.gpg
-
-  - name: Add github ppa
-    shell: >
-      echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
-      | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-    args:
-      creates: /etc/apt/sources.list.d/github-cli.list
 
   #- name: Add ratbagd ppa
   #  apt_repository:
@@ -127,38 +86,18 @@
       update_cache: true
       name:
       # prereq
-      - apt-transport-https
-      - flatpak
-      - flatpak-builder
       - lm-sensors
       - winehq-stable
       - mono-complete
-      # used by ansible conf module
-      - python3-psutil
+      - flatpak
+      - flatpak-builder
       # Needed for dropbox
       # - python3-gpg
       # cli
-      - tree
-      - atop
+      - smartmontools
       - octave
-      - btrfs-compsize
-      - build-essential
-      - curl
-      - vim
-      - trezor
-      - tmux
-      - tmuxp
-      - zstd
-      - p7zip-full
-      - vagrant
-      - gh
-      - powertop
       - winetricks
       - logiops
-      - colortest
-      - ansible
-      - ansible-lint
-      - smartmontools
       # - ratbagd
       # gui
       - gimp
@@ -409,6 +348,8 @@
     failed_when: false
 
   roles:
+
+  - role: common
 
   - role: gantsign.atom
     users:

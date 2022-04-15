@@ -1,0 +1,82 @@
+---
+
+# TODO: Move partner repo to its own file because it doesn't have the repos below
+
+#- name: Enable extra Ubuntu repos
+#  shell: apt-add-repository -y -n main universe restricted multiverse
+#  changed_when: false
+
+- name: Import helm key
+  get_url:
+    url: https://baltocdn.com/helm/signing.asc
+    dest: /etc/apt/trusted.gpg.d/helm.asc
+    
+- name: Add helm repo
+  apt_repository:
+    repo: deb https://baltocdn.com/helm/stable/debian/ all main
+    filename: helm-stable-debian
+    update_cache: false
+
+- name: Add Hashicorp gpg key
+  get_url:
+    url: https://apt.releases.hashicorp.com/gpg
+    dest: /etc/apt/trusted.gpg.d/hashicorp.asc
+
+- name: Add Hashicorp PPA
+  apt_repository:
+    repo: 'deb [arch=amd64] https://apt.releases.hashicorp.com {{ansible_distribution_release}} main'
+    filename: hashicorp
+
+- name: Add Github gpg key
+  shell: >
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+    | sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+  args:
+    creates: /usr/share/keyrings/githubcli-archive-keyring.gpg
+
+- name: Add github ppa
+  shell: >
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+    | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+  args:
+    creates: /etc/apt/sources.list.d/github-cli.list
+
+- name: Install packages
+  apt:
+    install_recommends: true
+    update_cache: true
+    name:
+    # prereq
+    - apt-transport-https
+    # used by ansible conf module
+    - python3-psutil
+    # cli
+    - tree
+    - atop
+    - btrfs-compsize
+    - build-essential
+    - curl
+    - vim
+    - trezor
+    - tmux
+    - tmuxp
+    - zstd
+    - p7zip-full
+    - vagrant
+    - gh
+    - powertop
+    - colortest
+    - ansible
+    - ansible-lint
+
+# This should be in a separate role/playbook because it is not a system config
+- name: git common settings
+  become: false
+  git_config:
+    scope: global
+    name: "{{ (item|dict2items)[0].key }}"
+    value: "{{ (item|dict2items)[0].value }}"
+  loop:
+  - user.name: Stephen Nichols
+  - core.editor: vim
+  
