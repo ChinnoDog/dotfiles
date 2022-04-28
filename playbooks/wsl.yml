@@ -4,5 +4,13 @@
   connection: local
   become: true
   vars:
+    vagrant_enable_var: 'export VAGRANT_WSL_ENABLE_WINDOWS_ACCESS="1"'
   roles:
   - role: common
+  post_tasks:
+
+  - name: Enable Vagrant to work in WSL
+    lineinfile:
+      path: ~/.bashrc
+      regexp: "^{{ vagrant_enable_var.split('=')[0] }}="
+      line: "{{ vagrant_enable_var }}"
