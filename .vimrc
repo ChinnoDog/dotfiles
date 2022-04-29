@@ -29,3 +29,6 @@ endif
 if has("syntax")
   syntax on
 endif
+
+" Recognize Vagrantfile as ruby
+autocmd BufNewFile,BufRead Vagrantfile set filetype=ruby
