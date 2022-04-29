@@ -68,8 +68,6 @@
     - colortest
     - ansible
     - ansible-lint
-    # gui
-    - virtualbox
 
 # This should be in a separate role/playbook because it is not a system config
 - block:

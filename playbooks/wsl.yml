@@ -14,3 +14,20 @@
       path: ~/.bashrc
       regexp: "^{{ vagrant_enable_var.split('=')[0] }}="
       line: "{{ vagrant_enable_var }}"
+   
+  - name: Add Microsoft key
+    get_url:
+      url: https://packages.microsoft.com/keys/microsoft.asc 
+      dest: /etc/apt/trusted.gpg.d/microsoft.asc
+
+  - name: Add Azure-cli PPA
+    apt_repository:
+      repo: "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ {{ansible_distribution_release}} main"
+      filename: azure-cli
+
+  - name: Install packages
+    apt:
+      install_recommends: true
+      update_cache: true
+      name:
+      - azure-cli

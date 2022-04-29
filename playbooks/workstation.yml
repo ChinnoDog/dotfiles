@@ -110,6 +110,7 @@
       - google-chrome-stable
       - timeshift
       - virt-manager
+      - virtualbox
       - torbrowser-launcher
       - firefox
       - xournal
