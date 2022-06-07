@@ -31,3 +31,18 @@
       update_cache: true
       name:
       - azure-cli
+
+- name: Configure WSL2 user profile
+  hosts: localhost
+  connection: local
+  become: false
+  tasks:
+
+  - name: git common settings
+    git_config:
+      scope: global
+      name: "{{ (item|dict2items)[0].key }}"
+      value: "{{ (item|dict2items)[0].value }}"
+    loop:
+    - user.email: snichols@nasuni.com
+
