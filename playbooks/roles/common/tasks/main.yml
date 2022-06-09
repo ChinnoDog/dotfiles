@@ -41,6 +41,16 @@
   args:
     creates: /etc/apt/sources.list.d/github-cli.list
 
+- name: Add Docker key
+  get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/trusted.gpg.d/docker.asc
+
+- name: Add Docker ppa
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable"
+    filename: docker
+
 - name: Install packages
   apt:
     install_recommends: true
@@ -68,6 +78,11 @@
     - colortest
     - ansible
     - ansible-lint
+    # docker
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-compose-plugin
 
 # This should be in a separate role/playbook because it is not a system config
 - block:
@@ -81,6 +96,18 @@
     - user.name: Stephen Nichols
     - core.editor: vim
     - commit.gpgsign: "true"
+
+  - name: Install pip modules
+    pip:
+      name: "{{item}}"
+    loop:
+    - awscliv2
+
+  - name: Tell gpg to ask for password in current shell
+    lineinfile:
+      path: ~/.bash_profile
+      regexp: "^GPG_TTY="
+      line: "GPG_TTY=$(tty)"
 
   # block params
   become: false
