@@ -106,8 +106,8 @@
   - name: Tell gpg to ask for password in current shell
     lineinfile:
       path: ~/.bash_profile
-      regexp: "^GPG_TTY="
-      line: "GPG_TTY=$(tty)"
+      regexp: "^export GPG_TTY="
+      line: "export GPG_TTY=$(tty)"
 
   # block params
   become: false
