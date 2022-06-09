@@ -85,6 +85,10 @@
       append: true
     become: true
 
+  - name: Set minikube driver to docker
+    command: minikube config set driver docker
+    changed_when: false
+
   - name: Create minikube kubectl alias
     lineinfile:
       path: ~/.bash_profile

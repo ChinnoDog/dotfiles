@@ -78,6 +78,7 @@
     - colortest
     - ansible
     - ansible-lint
+    - helm
     # docker
     - docker-ce
     - docker-ce-cli
