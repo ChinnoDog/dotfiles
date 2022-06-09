@@ -32,6 +32,32 @@
       name:
       - azure-cli
 
+  - name: Check for systemctl
+    command: systemctl status
+    changed_when: false
+    register: result
+
+  - block:
+
+    - name: Download wsl2-systemd script
+      git:
+        repo: https://github.com/DamionGans/ubuntu-wsl2-systemd-script.git
+        dest: /tmp/ubuntu-wsl2-systemd-script
+        depth: 1
+
+    # see: https://github.com/DamionGans/ubuntu-wsl2-systemd-script/issues/36#issuecomment-732090101
+    - name: Patch ws2-systmd script for Jammy
+      replace:
+        path: /tmp/ubuntu-wsl2-systemd-script/enter-systemd-namespace
+        regexp: '(exec /usr/bin/nsenter -t \"\$SYSTEMD_PID\") -a'
+        replace: '\1 -m -p'
+
+    - name: Install systemd into wsl2
+      command: bash /tmp/ubuntu-wsl2-systemd-script/ubuntu-wsl2-systemd-script.sh
+
+    # block params
+    when: result.rc
+
 - name: Configure WSL2 user profile
   hosts: localhost
   connection: local
@@ -46,3 +72,9 @@
     loop:
     - user.email: snichols@nasuni.com
 
+  - name: Add me to docker group
+    user:
+      name: "{{ ansible_env.USER }}"
+      groups: docker
+      append: true
+    become: true
