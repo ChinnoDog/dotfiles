@@ -51,6 +51,11 @@
     repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable"
     filename: docker
 
+- name: Add deadsnakes python ppa
+  apt_repository:
+    repo: ppa:deadsnakes/ppa
+    filename: deadsnakes
+
 - name: Install packages
   apt:
     install_recommends: true
@@ -106,7 +111,7 @@
 
   - name: Tell gpg to ask for password in current shell
     lineinfile:
-      path: ~/.bash_profile
+      path: ~/.bashrc
       regexp: "^export GPG_TTY="
       line: "export GPG_TTY=$(tty)"
 

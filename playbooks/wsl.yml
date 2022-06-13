@@ -33,6 +33,9 @@
       - azure-cli
       # systemd
       - conntrack
+      # Needed for awscli
+      - python3.9-dev
+      - python3.9-distutils
 
   - name: Check for systemctl
     command: systemctl status
@@ -91,6 +94,18 @@
 
   - name: Create minikube kubectl alias
     lineinfile:
-      path: ~/.bash_profile
+      path: ~/.bashrc
       regexp: "^alias kubectl="
       line: 'alias kubectl="minikube kubectl --"'
+
+  - name: Add local bin dir to path
+    lineinfile:
+      path: ~/.bashrc
+      line: PATH=.local/bin:$PATH
+
+  - name: Install awscliv2 from github
+    command: >-
+      python3.9 -m pip install
+      https://github.com/aws/aws-cli/archive/refs/heads/v2.zip
+    register: result
+    changed_when: not result.rc
