@@ -5,6 +5,7 @@
   become: true
   vars:
     vagrant_enable_var: 'export VAGRANT_WSL_ENABLE_WINDOWS_ACCESS="1"'
+    downloads: "/mnt/c/Users/{{ansible_env.SUDO_USER}}/Downloads"
   roles:
   - role: common
   post_tasks:
@@ -33,9 +34,6 @@
       - azure-cli
       # systemd
       - conntrack
-      # Needed for awscli
-      - python3.9-dev
-      - python3.9-distutils
 
   - name: Check for systemctl
     command: systemctl status
@@ -66,6 +64,29 @@
   - name: Install minikube
     apt:
       deb: https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+
+  - name: Download awscliv2
+    get_url:
+      url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+      dest: "{{ downloads }}/awscli-exe-linux-x86_64.zip"
+
+  - name: Extract awscliv2
+    unarchive:
+      src: "{{ downloads }}/awscli-exe-linux-x86_64.zip"
+      dest: "{{ downloads }}"
+      creates: "{{ downloads }}/aws"
+      remote_src: true
+    register: result
+
+  - name: Install awscliv2
+    command: "{{ downloads }}/aws/install"
+    args:
+      creates: /usr/local/bin/aws
+    when: result.changed
+
+  - name: Update awscliv2
+    command: "{{ downloads }}/aws/install --update"
+    when: result.changed
 
 - name: Configure WSL2 user profile
   hosts: localhost
@@ -102,10 +123,3 @@
     lineinfile:
       path: ~/.bashrc
       line: PATH=.local/bin:$PATH
-
-  - name: Install awscliv2 from github
-    command: >-
-      python3.9 -m pip install
-      https://github.com/aws/aws-cli/archive/refs/heads/v2.zip
-    register: result
-    changed_when: not result.rc
