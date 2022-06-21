@@ -93,6 +93,26 @@
   connection: local
   become: false
   tasks:
+  
+  - name: Link standard shell folders
+    file:
+      src: "/mnt/c/Users/{{ ansible_env.USER }}/{{ item }}"
+      dest: "~/{{item}}"
+      state: link
+    loop:
+    - Downloads
+    - Videos
+    - Music
+
+  - name: Link Onedrive shell folders
+    file:
+      src: "/mnt/c/Users/{{ ansible_env.USER }}/OneDrive - Nasuni/{{ item }}"
+      dest: "~/{{item}}"
+      state: link
+    loop:
+    - Documents
+    - Desktop
+    - Pictures
 
   - name: git common settings
     git_config:
