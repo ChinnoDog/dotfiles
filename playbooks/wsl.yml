@@ -88,6 +88,12 @@
     command: "{{ downloads }}/aws/install --update"
     when: result.changed
 
+  # nftables doesn't work with wsl2 kernel version
+  - name: Revert to ip-tables legacy
+    alternatives:
+      name: iptables
+      path: /usr/sbin/iptables-legacy
+
 - name: Configure WSL2 user profile
   hosts: localhost
   connection: local
