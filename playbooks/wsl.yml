@@ -61,9 +61,9 @@
     # block params
     when: result.rc
 
-  - name: Install minikube
-    apt:
-      deb: https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+  #- name: Install minikube
+  #  apt:
+  #    deb: https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
 
   - name: Download awscliv2
     get_url:
