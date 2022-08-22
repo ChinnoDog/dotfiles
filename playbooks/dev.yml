@@ -1,0 +1,108 @@
+---
+- name: Configure Ubuntu for work
+  hosts: localhost
+  connection: local
+  become: true
+  vars:
+    downloads: /tmp
+
+  roles:
+
+  - role: common
+
+  post_tasks:
+
+  - name: Install azure-cli
+    shell: "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash"
+    args:
+      creates: /usr/bin/az
+
+  #- name: Install packages
+  #  apt:
+  #    install_recommends: true
+  #    update_cache: true
+  #    name:
+  #    - azure-cli
+
+  #- name: Install minikube
+  #  apt:
+  #    deb: https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+
+  - name: Download awscliv2
+    get_url:
+      url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+      dest: "{{ downloads }}/awscli-exe-linux-x86_64.zip"
+
+  - name: Extract awscliv2
+    unarchive:
+      src: "{{ downloads }}/awscli-exe-linux-x86_64.zip"
+      dest: "{{ downloads }}"
+      creates: "{{ downloads }}/aws"
+      remote_src: true
+    register: result
+
+  - name: Install awscliv2
+    command: "{{ downloads }}/aws/install"
+    args:
+      creates: /usr/local/bin/aws
+    when: result.changed
+
+  - name: Update awscliv2
+    command: "{{ downloads }}/aws/install --update"
+    when: result.changed
+
+- name: Configure user profile
+  hosts: localhost
+  connection: local
+  become: false
+  tasks:
+  
+  #- name: Link standard shell folders
+  #  file:
+  #    src: "/mnt/c/Users/{{ ansible_env.USER }}/{{ item }}"
+  #    dest: "~/{{item}}"
+  #    state: link
+  #  loop:
+  #  - Downloads
+  #  - Videos
+  #  - Music
+
+  #- name: Link Onedrive shell folders
+  #  file:
+  #    src: "/mnt/c/Users/{{ ansible_env.USER }}/OneDrive - Nasuni/{{ item }}"
+  #    dest: "~/{{item}}"
+  #    state: link
+  #  loop:
+  #  - Documents
+  #  - Desktop
+  #  - Pictures
+
+  - name: git common settings
+    git_config:
+      scope: global
+      name: "{{ (item|dict2items)[0].key }}"
+      value: "{{ (item|dict2items)[0].value }}"
+    loop:
+    - user.email: snichols@nasuni.com
+
+  - name: Add me to docker group
+    user:
+      name: "{{ ansible_env.USER }}"
+      groups: docker
+      append: true
+    become: true
+
+  #- name: Set minikube driver to docker
+  #  command: minikube config set driver docker
+  #  changed_when: false
+
+  #- name: Create minikube kubectl alias
+  #  lineinfile:
+  #    path: ~/.bashrc
+  #    regexp: "^alias kubectl="
+  #    line: 'alias kubectl="minikube kubectl --"'
+
+  #- name: Add local bin dir to path
+  #  lineinfile:
+  #    path: ~/.bashrc
+  #    line: PATH=.local/bin:$PATH

@@ -2,9 +2,13 @@
 
 # TODO: Move partner repo to its own file because it doesn't have the repos below
 
-#- name: Enable extra Ubuntu repos
-#  shell: apt-add-repository -y -n main universe restricted multiverse
-#  changed_when: false
+- name: Enable extra Ubuntu repos
+  shell: "apt-add-repository -y -n {{item}}"
+  loop:
+  - universe
+  - multiverse
+  - restricted
+  changed_when: false
 
 - name: Import helm key
   get_url:
@@ -103,11 +107,11 @@
     - core.editor: vim
     - commit.gpgsign: "true"
 
-  - name: Install pip modules
-    pip:
-      name: "{{item}}"
-    loop:
-    - awscliv2
+  #- name: Install pip modules
+  #  pip:
+  #    name: "{{item}}"
+  #  loop:
+  #  - awscliv2
 
   - name: Tell gpg to ask for password in current shell
     lineinfile:
