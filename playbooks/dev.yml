@@ -61,13 +61,29 @@
   #  command: minikube config set driver docker
   #  changed_when: false
 
-  #- name: Create minikube kubectl alias
-  #  lineinfile:
-  #    path: ~/.bashrc
-  #    regexp: "^alias kubectl="
-  #    line: 'alias kubectl="minikube kubectl --"'
-
   #- name: Add local bin dir to path
   #  lineinfile:
   #    path: ~/.bashrc
   #    line: PATH=.local/bin:$PATH
+
+  - name: Create repositories dir
+    file:
+      path: ~/repositories
+      state: directory
+
+  - name: Add github to knwon hosts
+    shell: >-
+      if [ ! -n "$(grep "^github.com " ~/.ssh/known_hosts)" ]; then
+        ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null;
+      fi
+
+  - name: Add repos from github
+    shell: >-
+      curl -s https://api.github.com/users/chinnodog/repos 
+      | jq -r ".[].ssh_url" 
+      | xargs -P 4 -L1 git clone --recurse-submodules -j8
+    args:
+      chdir: ~/repositories
+      warn: false
+    failed_when: false
+

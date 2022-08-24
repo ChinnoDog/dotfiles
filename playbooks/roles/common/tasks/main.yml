@@ -130,6 +130,7 @@
     classic: true
   loop:
   - aws-cli
+  - powershell
 
 # This should be in a separate role/playbook because it is not a system config
 - block:
@@ -149,12 +150,6 @@
   #    name: "{{item}}"
   #  loop:
   #  - awscliv2
-
-  - name: Tell gpg to ask for password in current shell
-    lineinfile:
-      path: ~/.bashrc
-      regexp: "^export GPG_TTY="
-      line: "export GPG_TTY=$(tty)"
 
   # block params
   become: false

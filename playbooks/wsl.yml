@@ -139,12 +139,6 @@
     command: minikube config set driver docker
     changed_when: false
 
-  - name: Create minikube kubectl alias
-    lineinfile:
-      path: ~/.bashrc
-      regexp: "^alias kubectl="
-      line: 'alias kubectl="minikube kubectl --"'
-
   - name: Add local bin dir to path
     lineinfile:
       path: ~/.bashrc
