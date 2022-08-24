@@ -12,44 +12,9 @@
 
   post_tasks:
 
-  - name: Install azure-cli
-    shell: "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash"
-    args:
-      creates: /usr/bin/az
-
-  #- name: Install packages
-  #  apt:
-  #    install_recommends: true
-  #    update_cache: true
-  #    name:
-  #    - azure-cli
-
-  #- name: Install minikube
-  #  apt:
-  #    deb: https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
-
-  - name: Download awscliv2
-    get_url:
-      url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
-      dest: "{{ downloads }}/awscli-exe-linux-x86_64.zip"
-
-  - name: Extract awscliv2
-    unarchive:
-      src: "{{ downloads }}/awscli-exe-linux-x86_64.zip"
-      dest: "{{ downloads }}"
-      creates: "{{ downloads }}/aws"
-      remote_src: true
-    register: result
-
-  - name: Install awscliv2
-    command: "{{ downloads }}/aws/install"
-    args:
-      creates: /usr/local/bin/aws
-    when: result.changed
-
-  - name: Update awscliv2
-    command: "{{ downloads }}/aws/install --update"
-    when: result.changed
+  - name: Install minikube
+    apt:
+      deb: https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
 
 - name: Configure user profile
   hosts: localhost
@@ -85,12 +50,12 @@
     loop:
     - user.email: snichols@nasuni.com
 
-  - name: Add me to docker group
-    user:
-      name: "{{ ansible_env.USER }}"
-      groups: docker
-      append: true
-    become: true
+  #- name: Add me to docker group
+  #  user:
+  #    name: "{{ ansible_env.USER }}"
+  #    groups: docker
+  #    append: true
+  #  become: true
 
   #- name: Set minikube driver to docker
   #  command: minikube config set driver docker

@@ -45,20 +45,36 @@
   args:
     creates: /etc/apt/sources.list.d/github-cli.list
 
-- name: Add Docker key
-  get_url:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    dest: /etc/apt/trusted.gpg.d/docker.asc
+#- name: Add Docker key
+#  get_url:
+#    url: https://download.docker.com/linux/ubuntu/gpg
+#    dest: /etc/apt/trusted.gpg.d/docker.asc
 
-- name: Add Docker ppa
-  apt_repository:
-    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable"
-    filename: docker
+#- name: Add Docker ppa
+#  apt_repository:
+#    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable"
+#    filename: docker
 
 - name: Add deadsnakes python ppa
   apt_repository:
     repo: ppa:deadsnakes/ppa
     filename: deadsnakes
+
+
+- name: Add azure cli ppa
+  shell: "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash"
+  args:
+    creates: /usr/bin/az
+
+- name: Remove obsolete packages
+  apt:
+    state: absent
+    name:
+    # docker packages
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-compose-plugin
 
 - name: Install packages
   apt:
@@ -88,11 +104,22 @@
     - ansible
     - ansible-lint
     - helm
-    # docker
-    - docker-ce
-    - docker-ce-cli
-    - containerd.io
-    - docker-compose-plugin
+    - azure-cli
+
+- name: Install snaps
+  snap:
+    name:
+    - multipass
+    - canonical-livepatch
+    - storage-explorer
+    - docker
+
+- name: Install classic snaps
+  snap:
+    name: "{{item}}"
+    classic: true
+  loop:
+  - aws-cli
 
 # This should be in a separate role/playbook because it is not a system config
 - block:
