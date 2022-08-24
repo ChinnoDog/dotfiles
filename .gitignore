@@ -6,3 +6,6 @@
 !/bin
 !/.local/bin
 !/playbooks
+!.bashrc
+!.bashrc.d
+!.profile
