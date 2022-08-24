@@ -50,12 +50,12 @@
     loop:
     - user.email: snichols@nasuni.com
 
-  #- name: Add me to docker group
-  #  user:
-  #    name: "{{ ansible_env.USER }}"
-  #    groups: docker
-  #    append: true
-  #  become: true
+  - name: Add me to docker group
+    user:
+      name: "{{ ansible_env.USER }}"
+      groups: docker
+      append: true
+    become: true
 
   #- name: Set minikube driver to docker
   #  command: minikube config set driver docker

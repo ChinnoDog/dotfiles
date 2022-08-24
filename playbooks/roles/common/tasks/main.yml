@@ -114,6 +114,16 @@
     - storage-explorer
     - docker
 
+- name: Docker group
+  group:
+    name: docker
+    system: true
+  register: result
+
+- name: Re-enable docker snap
+  shell: snap disable docker && snap enable docker
+  when: result.changed
+
 - name: Install classic snaps
   snap:
     name: "{{item}}"
