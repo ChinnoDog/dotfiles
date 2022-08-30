@@ -45,15 +45,15 @@
   args:
     creates: /etc/apt/sources.list.d/github-cli.list
 
-#- name: Add Docker key
-#  get_url:
-#    url: https://download.docker.com/linux/ubuntu/gpg
-#    dest: /etc/apt/trusted.gpg.d/docker.asc
+- name: Add Docker key
+  get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/trusted.gpg.d/docker.asc
 
-#- name: Add Docker ppa
-#  apt_repository:
-#    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable"
-#    filename: docker
+- name: Add Docker ppa
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable"
+    filename: docker
 
 - name: Add deadsnakes python ppa
   apt_repository:
@@ -65,16 +65,6 @@
   shell: "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash"
   args:
     creates: /usr/bin/az
-
-- name: Remove obsolete packages
-  apt:
-    state: absent
-    name:
-    # docker packages
-    - docker-ce
-    - docker-ce-cli
-    - containerd.io
-    - docker-compose-plugin
 
 - name: Install packages
   apt:
@@ -107,6 +97,12 @@
     - azure-cli
     - apt-file
     - cifs-utils
+    # docker packages
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-compose-plugin
+
 
 - name: Install snaps
   snap:
@@ -114,17 +110,12 @@
     - multipass
     - canonical-livepatch
     - storage-explorer
-    - docker
 
-- name: Docker group
-  group:
-    name: docker
-    system: true
-  register: result
-
-- name: Re-enable docker snap
-  shell: snap disable docker && snap enable docker
-  when: result.changed
+#- name: Docker group
+#  group:
+#    name: docker
+#    system: true
+#  register: result
 
 - name: Install classic snaps
   snap:
