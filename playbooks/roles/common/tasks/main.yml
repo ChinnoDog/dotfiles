@@ -105,6 +105,8 @@
     - ansible-lint
     - helm
     - azure-cli
+    - apt-file
+    - cifs-utils
 
 - name: Install snaps
   snap:
@@ -129,7 +131,6 @@
     name: "{{item}}"
     classic: true
   loop:
-  - aws-cli
   - powershell
 
 # This should be in a separate role/playbook because it is not a system config

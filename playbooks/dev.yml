@@ -87,3 +87,14 @@
       warn: false
     failed_when: false
 
+  - name: Add ZeroBraneStudio repo
+    git:
+      repo: git@github.com:pkulchenko/ZeroBraneStudio.git
+      dest: ~/repositories/ZeroBraneStudio
+      update: false
+
+  - name: Install ZeroBraneStudio dependencies
+    apt:
+      name:
+      - libgtk2.0-0
+      - xdg-utils
