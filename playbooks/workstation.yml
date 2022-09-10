@@ -168,6 +168,7 @@
     - com.slack.Slack
     - com.discordapp.Discord
     - org.kde.okular
+    #- com.obsproject.Studio
     #- com.spotify.Client
 
   - name: Grant flatpak permissions to home dir
