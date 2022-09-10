@@ -2,9 +2,13 @@
 
 # TODO: Move partner repo to its own file because it doesn't have the repos below
 
-#- name: Enable extra Ubuntu repos
-#  shell: apt-add-repository -y -n main universe restricted multiverse
-#  changed_when: false
+- name: Enable extra Ubuntu repos
+  shell: "apt-add-repository -y -n {{item}}"
+  loop:
+  - universe
+  - multiverse
+  - restricted
+  changed_when: false
 
 - name: Import helm key
   get_url:
@@ -41,6 +45,27 @@
   args:
     creates: /etc/apt/sources.list.d/github-cli.list
 
+- name: Add Docker key
+  get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/trusted.gpg.d/docker.asc
+
+- name: Add Docker ppa
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable"
+    filename: docker
+
+- name: Add deadsnakes python ppa
+  apt_repository:
+    repo: ppa:deadsnakes/ppa
+    filename: deadsnakes
+
+
+- name: Add azure cli ppa
+  shell: "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash"
+  args:
+    creates: /usr/bin/az
+
 - name: Install packages
   apt:
     install_recommends: true
@@ -68,6 +93,36 @@
     - colortest
     - ansible
     - ansible-lint
+    - helm
+    - azure-cli
+    - apt-file
+    - cifs-utils
+    # docker packages
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-compose-plugin
+
+
+- name: Install snaps
+  snap:
+    name:
+    - multipass
+    - canonical-livepatch
+    - storage-explorer
+
+#- name: Docker group
+#  group:
+#    name: docker
+#    system: true
+#  register: result
+
+- name: Install classic snaps
+  snap:
+    name: "{{item}}"
+    classic: true
+  loop:
+  - powershell
 
 # This should be in a separate role/playbook because it is not a system config
 - block:
@@ -81,6 +136,12 @@
     - user.name: Stephen Nichols
     - core.editor: vim
     - commit.gpgsign: "true"
+
+  #- name: Install pip modules
+  #  pip:
+  #    name: "{{item}}"
+  #  loop:
+  #  - awscliv2
 
   # block params
   become: false

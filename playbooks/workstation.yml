@@ -103,7 +103,6 @@
       - gimp
       - inkscape
       - keepassxc
-      - virtualbox
       - multisystem
       - nautilus-dropbox
       - steam
@@ -111,6 +110,7 @@
       - google-chrome-stable
       - timeshift
       - virt-manager
+      - virtualbox
       - torbrowser-launcher
       - firefox
       - xournal
@@ -133,8 +133,6 @@
     snap:
       name:
       - spotify
-      - multipass
-      - canonical-livepatch
       - xmind
       - acrordrdc
 

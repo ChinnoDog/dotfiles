@@ -4,5 +4,142 @@
   connection: local
   become: true
   vars:
+    vagrant_enable_var: 'export VAGRANT_WSL_ENABLE_WINDOWS_ACCESS="1"'
+    downloads: "/mnt/c/Users/{{ansible_env.SUDO_USER}}/Downloads"
   roles:
   - role: common
+  post_tasks:
+
+  - name: Enable Vagrant to work in WSL
+    lineinfile:
+      path: ~/.bashrc
+      regexp: "^{{ vagrant_enable_var.split('=')[0] }}="
+      line: "{{ vagrant_enable_var }}"
+   
+  - name: Add Microsoft key
+    get_url:
+      url: https://packages.microsoft.com/keys/microsoft.asc 
+      dest: /etc/apt/trusted.gpg.d/microsoft.asc
+
+  - name: Add Azure-cli PPA
+    apt_repository:
+      repo: "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ {{ansible_distribution_release}} main"
+      filename: azure-cli
+
+  - name: Install packages
+    apt:
+      install_recommends: true
+      update_cache: true
+      name:
+      - azure-cli
+      # systemd
+      - conntrack
+
+  - name: Check for systemctl
+    command: systemctl status
+    changed_when: false
+    register: result
+
+  - block:
+
+    - name: Download wsl2-systemd script
+      git:
+        repo: https://github.com/DamionGans/ubuntu-wsl2-systemd-script.git
+        dest: /tmp/ubuntu-wsl2-systemd-script
+        depth: 1
+
+    # see: https://github.com/DamionGans/ubuntu-wsl2-systemd-script/issues/36#issuecomment-732090101
+    - name: Patch ws2-systmd script for Jammy
+      replace:
+        path: /tmp/ubuntu-wsl2-systemd-script/enter-systemd-namespace
+        regexp: '(exec /usr/bin/nsenter -t \"\$SYSTEMD_PID\") -a'
+        replace: '\1 -m -p'
+
+    - name: Install systemd into wsl2
+      command: bash /tmp/ubuntu-wsl2-systemd-script/ubuntu-wsl2-systemd-script.sh
+
+    # block params
+    when: result.rc
+
+  #- name: Install minikube
+  #  apt:
+  #    deb: https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+
+  - name: Download awscliv2
+    get_url:
+      url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+      dest: "{{ downloads }}/awscli-exe-linux-x86_64.zip"
+
+  - name: Extract awscliv2
+    unarchive:
+      src: "{{ downloads }}/awscli-exe-linux-x86_64.zip"
+      dest: "{{ downloads }}"
+      creates: "{{ downloads }}/aws"
+      remote_src: true
+    register: result
+
+  - name: Install awscliv2
+    command: "{{ downloads }}/aws/install"
+    args:
+      creates: /usr/local/bin/aws
+    when: result.changed
+
+  - name: Update awscliv2
+    command: "{{ downloads }}/aws/install --update"
+    when: result.changed
+
+  # nftables doesn't work with wsl2 kernel version
+  - name: Revert to ip-tables legacy
+    alternatives:
+      name: iptables
+      path: /usr/sbin/iptables-legacy
+
+- name: Configure WSL2 user profile
+  hosts: localhost
+  connection: local
+  become: false
+  tasks:
+  
+  - name: Link standard shell folders
+    file:
+      src: "/mnt/c/Users/{{ ansible_env.USER }}/{{ item }}"
+      dest: "~/{{item}}"
+      state: link
+    loop:
+    - Downloads
+    - Videos
+    - Music
+
+  - name: Link Onedrive shell folders
+    file:
+      src: "/mnt/c/Users/{{ ansible_env.USER }}/OneDrive - Nasuni/{{ item }}"
+      dest: "~/{{item}}"
+      state: link
+    loop:
+    - Documents
+    - Desktop
+    - Pictures
+
+  - name: git common settings
+    git_config:
+      scope: global
+      name: "{{ (item|dict2items)[0].key }}"
+      value: "{{ (item|dict2items)[0].value }}"
+    loop:
+    - user.email: snichols@nasuni.com
+
+  - name: Add me to docker group
+    user:
+      name: "{{ ansible_env.USER }}"
+      groups: docker
+      append: true
+    become: true
+
+  - name: Set minikube driver to docker
+    command: minikube config set driver docker
+    changed_when: false
+
+  - name: Add local bin dir to path
+    lineinfile:
+      path: ~/.bashrc
+      line: PATH=.local/bin:$PATH
