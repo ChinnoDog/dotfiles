@@ -12,5 +12,7 @@ shopt -s histappend
 # export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 
 # After each command save the history but don't reload it
-export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+echo $PROMPT_COMMAND | if ! grep "^history -a" >/dev/null; then 
+  export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+fi
 
