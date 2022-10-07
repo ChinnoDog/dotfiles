@@ -8,7 +8,9 @@ if ([ "$SESSION_TYPE" == "remote/ssh" ] && [ "$VIRT" == "microsoft" ]) || \
    [ "$VIRT" == "wsl" ]; then
   GW=$(ip route list default | awk '{print $3}')
   if [ "$(echo $GW | cut -f1 -d.)" == "172" ]; then
+    GWDIG=$(dig +short -x $GW)
+    GWHOST=${GWDIG::-1}
     export LIBGL_ALWAYS_INDIRECT=1
-    export DISPLAY=$GW:0
+    export DISPLAY=$GWHOST:0
   fi
 fi
