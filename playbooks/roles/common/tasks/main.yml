@@ -73,6 +73,7 @@
     name:
     # prereq
     - apt-transport-https
+    - python3-pip
     # used by ansible conf module
     - python3-psutil
     # cli
@@ -137,11 +138,13 @@
     - core.editor: vim
     - commit.gpgsign: "true"
 
-  #- name: Install pip modules
-  #  pip:
-  #    name: "{{item}}"
-  #  loop:
-  #  - awscliv2
+  - name: Install pip modules
+    pip:
+      name: "{{item}}"
+    loop:
+    - jupyterlab
+    # jupyterlab includes ipython but we should be explicit
+    - ipython
 
   # block params
   become: false

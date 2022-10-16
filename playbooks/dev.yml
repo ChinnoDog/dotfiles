@@ -16,6 +16,18 @@
     apt:
       deb: https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
 
+  - name: Install theme packages
+    apt:
+      update_cache: false
+      name:
+      - yaru-theme-gtk
+      - lxappearance
+
+  - name: Install Chromium
+    snap:
+      name:
+      - chromium
+
 - name: Configure user profile
   hosts: localhost
   connection: local

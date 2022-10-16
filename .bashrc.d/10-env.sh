@@ -1,4 +1,9 @@
 #!/bin/sh
+# Configure bash environment
+
+# Add local bin
+p=~/.local/bin
+[[ ":$PATH:" != *":$p:"* ]] && PATH="$p:${PATH}"
 
 # Always copy using reflinks and sparse file processing
 alias cp='cp --reflink=auto --sparse=always'
