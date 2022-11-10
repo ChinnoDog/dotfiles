@@ -28,6 +28,16 @@
       name:
       - chromium
 
+  - name: Install VSCodium
+    snap:
+      name: codium
+      classic: true
+
+  - name: Install VSCode
+    snap:
+      name: code
+      classic: true
+
 - name: Configure user profile
   hosts: localhost
   connection: local

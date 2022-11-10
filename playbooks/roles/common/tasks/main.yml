@@ -145,6 +145,7 @@
     - jupyterlab
     # jupyterlab includes ipython but we should be explicit
     - ipython
+    - 'xonsh[full]'
 
   # block params
   become: false
