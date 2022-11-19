@@ -117,6 +117,7 @@
       # obs requires v4l2loopback-dkms
       - v4l2loopback-dkms
       - obs-studio
+      - ffmpeg
       # Display decorations
       - gnome-tweaks
       - solaar
