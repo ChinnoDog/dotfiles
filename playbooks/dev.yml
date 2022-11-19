@@ -16,6 +16,33 @@
     apt:
       deb: https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
 
+  - name: Install apt packages
+    apt:
+      update_cache: false
+      name:
+      # Theme packages
+      - yaru-theme-gtk
+      - lxappearance
+      # ZeroBraneStudio dependencies
+      - libgtk2.0-0
+      - xdg-utils
+
+  - name: Install Chromium
+    snap:
+      name:
+      - chromium
+
+  - name: Install VSCodium
+    snap:
+      name: codium
+      classic: true
+
+  - name: Install VSCode
+    snap:
+      name: code
+      classic: true
+
+
 - name: Configure user profile
   hosts: localhost
   connection: local
@@ -92,9 +119,3 @@
       repo: git@github.com:pkulchenko/ZeroBraneStudio.git
       dest: ~/repositories/ZeroBraneStudio
       update: false
-
-  - name: Install ZeroBraneStudio dependencies
-    apt:
-      name:
-      - libgtk2.0-0
-      - xdg-utils
