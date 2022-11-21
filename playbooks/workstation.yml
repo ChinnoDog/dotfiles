@@ -4,8 +4,9 @@
   connection: local
   become: true
   vars:
-
-  pre_tasks:
+  roles:
+  - role: common
+  tasks:
 
   # Not yet available for impish
   # See: https://launchpad.net/~phoerious/+archive/ubuntu/keepassxc
@@ -117,6 +118,7 @@
       # obs requires v4l2loopback-dkms
       - v4l2loopback-dkms
       - obs-studio
+      - ffmpeg
       # Display decorations
       - gnome-tweaks
       - solaar
@@ -133,8 +135,11 @@
     snap:
       name:
       - spotify
-      - xmind
       - acrordrdc
+      # mind mapping apps
+      - xmind
+      - freemind
+      - freeplane-mindmapping
 
   - name: Apply apparmor band-aid for Spotify
     shell: snap connect spotify:network-manager-observe :network-manager-observe
@@ -166,6 +171,7 @@
     - com.slack.Slack
     - com.discordapp.Discord
     - org.kde.okular
+    - net.cozic.joplin_desktop
     #- com.obsproject.Studio
     #- com.spotify.Client
 
@@ -347,8 +353,6 @@
     failed_when: false
 
   roles:
-
-  - role: common
 
   - role: gantsign.atom
     users:
