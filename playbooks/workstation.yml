@@ -103,7 +103,6 @@
       # gui
       - gimp
       - inkscape
-      - keepassxc
       - multisystem
       - nautilus-dropbox
       - steam
@@ -136,6 +135,8 @@
       name:
       - spotify
       - acrordrdc
+      # Must still run helper script to get keepassxc working with browser
+      - keepassxc
       # mind mapping apps
       - xmind
       - freemind
