@@ -93,10 +93,13 @@
   #    path: ~/.bashrc
   #    line: PATH=.local/bin:$PATH
 
-  - name: Create repositories dir
+  - name: Create standard dirs in home dir
     file:
-      path: ~/repositories
+      path: "~/{{item}}"
       state: directory
+    loop:
+    - repositories
+    - Downloads
 
   - name: Add github to knwon hosts
     shell: >-

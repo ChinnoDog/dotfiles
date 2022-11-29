@@ -106,7 +106,6 @@
     #- containerd.io
     #- docker-compose-plugin
 
-
 - name: Install snaps
   snap:
     name:
@@ -127,6 +126,13 @@
     classic: true
   loop:
   - powershell
+
+- name: Make python3 default python
+  alternatives:
+    name: python
+    link: /usr/bin/python
+    path: /usr/bin/python3
+    priority: 1
 
 # This should be in a separate role/playbook because it is not a system config
 - block:
