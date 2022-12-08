@@ -27,21 +27,20 @@
       - libgtk2.0-0
       - xdg-utils
 
-  - name: Install Chromium
+  - name: Install snaps
     snap:
       name:
       - chromium
+      - storage-explorer
 
-  - name: Install VSCodium
+  - name: Install classic snaps
     snap:
       name: codium
       classic: true
-
-  - name: Install VSCode
-    snap:
-      name: code
-      classic: true
-
+    loop:
+    - codium
+    - code
+    - powershell
 
 - name: Configure user profile
   hosts: localhost

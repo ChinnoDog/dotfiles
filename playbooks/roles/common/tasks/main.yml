@@ -104,26 +104,11 @@
     - containerd.io
     - docker-compose-plugin
 
-
-- name: Install snaps
-  snap:
-    name:
-    - multipass
-    - canonical-livepatch
-    - storage-explorer
-
 #- name: Docker group
 #  group:
 #    name: docker
 #    system: true
 #  register: result
-
-- name: Install classic snaps
-  snap:
-    name: "{{item}}"
-    classic: true
-  loop:
-  - powershell
 
 # This should be in a separate role/playbook because it is not a system config
 - block:

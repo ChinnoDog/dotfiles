@@ -135,6 +135,16 @@
       - spotify
       - xmind
       - acrordrdc
+      - multipass
+      - canonical-livepatch
+      - storage-explorer
+
+  - name: Install classic snaps
+    snap:
+      name: "{{item}}"
+      classic: true
+    loop:
+    - powershell
 
   - name: Apply apparmor band-aid for Spotify
     shell: snap connect spotify:network-manager-observe :network-manager-observe
