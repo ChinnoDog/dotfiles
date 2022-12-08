@@ -4,8 +4,9 @@
   connection: local
   become: true
   vars:
-
-  pre_tasks:
+  roles:
+  - role: common
+  tasks:
 
   # Not yet available for impish
   # See: https://launchpad.net/~phoerious/+archive/ubuntu/keepassxc
@@ -102,7 +103,6 @@
       # gui
       - gimp
       - inkscape
-      - keepassxc
       - multisystem
       - nautilus-dropbox
       - steam
@@ -117,6 +117,7 @@
       # obs requires v4l2loopback-dkms
       - v4l2loopback-dkms
       - obs-studio
+      - ffmpeg
       # Display decorations
       - gnome-tweaks
       - solaar
@@ -133,11 +134,16 @@
     snap:
       name:
       - spotify
-      - xmind
       - acrordrdc
       - multipass
       - canonical-livepatch
       - storage-explorer
+      # Must still run helper script to get keepassxc working with browser
+      - keepassxc
+      # mind mapping apps
+      - xmind
+      - freemind
+      - freeplane-mindmapping
 
   - name: Install classic snaps
     snap:
@@ -176,6 +182,7 @@
     - com.slack.Slack
     - com.discordapp.Discord
     - org.kde.okular
+    - net.cozic.joplin_desktop
     #- com.obsproject.Studio
     #- com.spotify.Client
 
@@ -357,8 +364,6 @@
     failed_when: false
 
   roles:
-
-  - role: common
 
   - role: gantsign.atom
     users:
