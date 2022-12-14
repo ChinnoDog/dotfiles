@@ -103,7 +103,6 @@
       # gui
       - gimp
       - inkscape
-      - keepassxc
       - multisystem
       - nautilus-dropbox
       - steam
@@ -136,10 +135,22 @@
       name:
       - spotify
       - acrordrdc
+      - multipass
+      - canonical-livepatch
+      - storage-explorer
+      # Must still run helper script to get keepassxc working with browser
+      - keepassxc
       # mind mapping apps
       - xmind
       - freemind
       - freeplane-mindmapping
+
+  - name: Install classic snaps
+    snap:
+      name: "{{item}}"
+      classic: true
+    loop:
+    - powershell
 
   - name: Apply apparmor band-aid for Spotify
     shell: snap connect spotify:network-manager-observe :network-manager-observe

@@ -11,11 +11,11 @@
   - role: awscliv2
   post_tasks:
 
-  - name: Enable Vagrant to work in WSL
-    lineinfile:
-      path: ~/.bashrc
-      regexp: "^{{ vagrant_enable_var.split('=')[0] }}="
-      line: "{{ vagrant_enable_var }}"
+  #- name: Enable Vagrant to work in WSL
+  #  lineinfile:
+  #    path: ~/.bashrc
+  #    regexp: "^{{ vagrant_enable_var.split('=')[0] }}="
+  #    line: "{{ vagrant_enable_var }}"
    
   - name: Add Microsoft key
     get_url:
@@ -34,43 +34,43 @@
       name:
       - azure-cli
       # systemd
-      - conntrack
+      # - conntrack
 
-  - name: Check for systemctl
-    command: systemctl status
-    changed_when: false
-    register: result
+  #- name: Check for systemctl
+  #  command: systemctl status
+  #  changed_when: false
+  #  register: result
 
-  - block:
+  #- block:
 
-    - name: Download wsl2-systemd script
-      git:
-        repo: https://github.com/DamionGans/ubuntu-wsl2-systemd-script.git
-        dest: /tmp/ubuntu-wsl2-systemd-script
-        depth: 1
+  #  - name: Download wsl2-systemd script
+  #    git:
+  #      repo: https://github.com/DamionGans/ubuntu-wsl2-systemd-script.git
+  #      dest: /tmp/ubuntu-wsl2-systemd-script
+  #      depth: 1
 
-    # see: https://github.com/DamionGans/ubuntu-wsl2-systemd-script/issues/36#issuecomment-732090101
-    - name: Patch ws2-systmd script for Jammy
-      replace:
-        path: /tmp/ubuntu-wsl2-systemd-script/enter-systemd-namespace
-        regexp: '(exec /usr/bin/nsenter -t \"\$SYSTEMD_PID\") -a'
-        replace: '\1 -m -p'
+  #  # see: https://github.com/DamionGans/ubuntu-wsl2-systemd-script/issues/36#issuecomment-732090101
+  #  - name: Patch ws2-systmd script for Jammy
+  #    replace:
+  #      path: /tmp/ubuntu-wsl2-systemd-script/enter-systemd-namespace
+  #      regexp: '(exec /usr/bin/nsenter -t \"\$SYSTEMD_PID\") -a'
+  #      replace: '\1 -m -p'
 
-    - name: Install systemd into wsl2
-      command: bash /tmp/ubuntu-wsl2-systemd-script/ubuntu-wsl2-systemd-script.sh
+  #  - name: Install systemd into wsl2
+  #    command: bash /tmp/ubuntu-wsl2-systemd-script/ubuntu-wsl2-systemd-script.sh
 
-    # block params
-    when: result.rc
+  #  # block params
+  #  when: result.rc
 
   #- name: Install minikube
   #  apt:
   #    deb: https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
 
   # nftables doesn't work with wsl2 kernel version
-  - name: Revert to ip-tables legacy
-    alternatives:
-      name: iptables
-      path: /usr/sbin/iptables-legacy
+  #- name: Revert to ip-tables legacy
+  #  alternatives:
+  #    name: iptables
+  #    path: /usr/sbin/iptables-legacy
 
 - name: Configure WSL2 user profile
   hosts: localhost
