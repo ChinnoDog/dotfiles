@@ -1,0 +1,8 @@
+#!/bin/sh
+# Remove all Docker images
+images=$(docker images -q | sort | uniq)
+if [ -z "$images" ]; then
+  echo No images found.
+else
+  echo $images | xargs -L1 docker rmi -f
+fi
