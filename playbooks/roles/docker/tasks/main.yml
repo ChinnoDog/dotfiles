@@ -1,0 +1,29 @@
+---
+
+- name: Add Docker key
+  shell: >
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+    | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  args:
+    creates: /etc/apt/keyrings/docker.gpg
+
+- name: Manage packages
+  include_tasks: packages.yml
+  vars:
+    docker_package_state: "{{ item }}"
+  loop:
+  - absent
+  - present
+
+- name: Docker group
+  group:
+    name: docker
+    system: true
+  register: result
+
+- name: Add users to docker group
+  user:
+    name: "{{ item }}"
+    groups: docker
+    append: true
+  loop: "{{ [ docker_add_users ] | flatten }}"

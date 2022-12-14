@@ -8,6 +8,7 @@
     downloads: "/mnt/c/Users/{{ansible_env.SUDO_USER}}/Downloads"
   roles:
   - role: common
+  - role: awscliv2
   post_tasks:
 
   - name: Enable Vagrant to work in WSL
@@ -65,29 +66,6 @@
   #  apt:
   #    deb: https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
 
-  - name: Download awscliv2
-    get_url:
-      url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
-      dest: "{{ downloads }}/awscli-exe-linux-x86_64.zip"
-
-  - name: Extract awscliv2
-    unarchive:
-      src: "{{ downloads }}/awscli-exe-linux-x86_64.zip"
-      dest: "{{ downloads }}"
-      creates: "{{ downloads }}/aws"
-      remote_src: true
-    register: result
-
-  - name: Install awscliv2
-    command: "{{ downloads }}/aws/install"
-    args:
-      creates: /usr/local/bin/aws
-    when: result.changed
-
-  - name: Update awscliv2
-    command: "{{ downloads }}/aws/install --update"
-    when: result.changed
-
   # nftables doesn't work with wsl2 kernel version
   - name: Revert to ip-tables legacy
     alternatives:
@@ -127,13 +105,6 @@
       value: "{{ (item|dict2items)[0].value }}"
     loop:
     - user.email: snichols@nasuni.com
-
-  - name: Add me to docker group
-    user:
-      name: "{{ ansible_env.USER }}"
-      groups: docker
-      append: true
-    become: true
 
   - name: Set minikube driver to docker
     command: minikube config set driver docker

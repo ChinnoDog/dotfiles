@@ -1,0 +1,24 @@
+---
+- name: Install unzip
+  apt:
+    name: unzip
+
+- name: Extract awscliv2
+  unarchive:
+    src: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+    dest: "{{ downloads }}"
+    creates: "{{ downloads }}/aws"
+    remote_src: true
+  register: result
+
+- name: Install awscliv2
+  command: "{{ downloads }}/aws/install"
+  args:
+    creates: /usr/local/bin/aws
+  when: result.changed
+
+# Run this to make sure we are at the latest version
+- name: Update awscliv2
+  command: "{{ downloads }}/aws/install --update"
+  when: result.changed
+
