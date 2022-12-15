@@ -206,6 +206,12 @@
       path: /opt/Shadow.AppImage
       state: absent
 
+  - name: Install Trezor app
+    get_url:
+      url: https://trezor.io/content/binaries/trezor-suite/Trezor-Suite-22.11.1-linux-x86_64.AppImage
+      dest: /opt/Trezor-Suite.AppImage
+      mode: 0755
+
   - name: Install WebEx
     apt:
       deb: https://binaries.webex.com/WebexDesktop-Ubuntu-Official-Package/Webex.deb
