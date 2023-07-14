@@ -1,0 +1,3 @@
+#!/usr/bin/env python3
+# from: https://gist.github.com/mboersma/1329671
+import sys, yaml, json; j=json.loads(sys.stdin.read()); print(yaml.safe_dump(j))
