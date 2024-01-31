@@ -95,8 +95,6 @@
     - canonical-livepatch
     - storage-explorer
 
-<<<<<<< HEAD
-=======
 - name: Install classic snaps
   snap:
     name: "{{item}}"
@@ -111,7 +109,6 @@
     path: /usr/bin/python3
     priority: 1
 
->>>>>>> d462f2f2c521639cc3094fbc5aa2df69e0eba654
 # This should be in a separate role/playbook because it is not a system config
 - block:
 
