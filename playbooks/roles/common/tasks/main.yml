@@ -121,6 +121,7 @@
     - user.name: Stephen Nichols
     - core.editor: vim
     - commit.gpgsign: "true"
+    - pull.rebase: "true"
 
   - name: Install pip modules
     pip:
