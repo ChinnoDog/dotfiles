@@ -6,9 +6,21 @@
   vars:
     downloads: /tmp
 
+  pre_tasks:
+
+  - name: Gather user facts
+    setup:
+      gather_subset: '!all'
+    become: false
+    register: user_facts
+
   roles:
 
   - role: common
+  - role: awscliv2
+  - role: docker
+    docker_install_method: apt
+    docker_add_users: "{{ user_facts.ansible_facts.ansible_env.USER }}"
 
   post_tasks:
 
@@ -27,21 +39,20 @@
       - libgtk2.0-0
       - xdg-utils
 
-  - name: Install Chromium
+  - name: Install snaps
     snap:
       name:
       - chromium
+      - storage-explorer
 
-  - name: Install VSCodium
+  - name: Install classic snaps
     snap:
-      name: codium
+      name: "{{ item }}"
       classic: true
-
-  - name: Install VSCode
-    snap:
-      name: code
-      classic: true
-
+    loop:
+    - codium
+    - code
+    - powershell
 
 - name: Configure user profile
   hosts: localhost
@@ -77,13 +88,6 @@
     loop:
     - user.email: snichols@nasuni.com
 
-  - name: Add me to docker group
-    user:
-      name: "{{ ansible_env.USER }}"
-      groups: docker
-      append: true
-    become: true
-
   #- name: Set minikube driver to docker
   #  command: minikube config set driver docker
   #  changed_when: false
@@ -93,10 +97,13 @@
   #    path: ~/.bashrc
   #    line: PATH=.local/bin:$PATH
 
-  - name: Create repositories dir
+  - name: Create standard dirs in home dir
     file:
-      path: ~/repositories
+      path: "~/{{item}}"
       state: directory
+    loop:
+    - repositories
+    - Downloads
 
   - name: Add github to knwon hosts
     shell: >-

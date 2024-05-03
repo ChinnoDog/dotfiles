@@ -12,3 +12,6 @@ alias cp='cp --reflink=auto --sparse=always'
 if [ "$LIBGL_ALWAYS_INDIRECT" == "1" ]; then
   alias atom="atom --in-process-gpu"
 fi
+
+# Command for reloading environment in tmux
+alias tmux-env-reload='eval $(tmux show-environment -s)'
