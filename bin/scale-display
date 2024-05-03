@@ -1,0 +1,13 @@
+#!/bin/sh
+# Scale display elements for low dpi displays
+if [ $# -eq 0 ]; then
+  echo Resetting parameters
+  gsettings reset org.gnome.desktop.interface text-scaling-factor
+  gsettings reset org.gnome.shell.extensions.dash-to-dock dash-max-icon-size
+else
+  echo Setting scale factor $1
+  gsettings set org.gnome.desktop.interface text-scaling-factor $1
+  p=$(echo "48 * $1" | bc); p=${p%%.*}
+  echo calculated icon max size as $p
+  gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size $p
+fi

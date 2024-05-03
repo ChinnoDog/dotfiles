@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Path to zstd executable
+ZSTD="/usr/bin/zstd"
+
+# Store additional parameters for zstd compression
+ZSTD_PARAMS="--adapt"
+
+# Function to determine if the -Z flag is present
+use_compression=false
+ssh_params=()
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -Z)
+            use_compression=true
+            shift # remove the flag from parameters
+            ;;
+        *)
+            ssh_params+=("$1") # Collect remaining parameters for ssh
+            shift
+            ;;
+    esac
+done
+
+# Define how to handle compression
+if [ "$use_compression" = true ]; then
+    # Check if stdin is a terminal
+    if [ -t 0 ]; then
+        # stdin is from a terminal, invoke ssh normally for interactive mode
+        ssh -tt "${ssh_params[@]}" 'bash -l'
+    else
+        # Handle non-terminal stdin for script or piped input
+        exec 3>&1 # Duplicate stdout to fd 3 for later use
+        {
+            # Use process substitution to handle input and output compression
+            $ZSTD $ZSTD_PARAMS -c | ssh "${ssh_params[@]}" "$ZSTD -d -q -c && exec \$(getent passwd \$(whoami) | cut -d: -f7)" | $ZSTD -d -q -c
+        } <&0 >&3
+    fi
+else
+    # Directly execute ssh command with parameters
+    ssh "${ssh_params[@]}"
+fi
+
