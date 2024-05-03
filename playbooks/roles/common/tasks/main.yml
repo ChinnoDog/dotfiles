@@ -55,6 +55,11 @@
   args:
     creates: /usr/bin/az
 
+- name: Add ansible ppa
+  apt_repository:
+    repo: ppa:ansible/ansible
+    filename: ansible
+
 - name: Install packages
   apt:
     install_recommends: true
@@ -122,6 +127,7 @@
     - core.editor: vim
     - commit.gpgsign: "true"
     - pull.rebase: "true"
+    - init.defaultBranch: master 
 
   - name: Install pip modules
     pip:
