@@ -1,0 +1,20 @@
+---
+- name: Configure VS Code settings
+  hosts: localhost
+  become: no
+  tasks:
+    - name: Ensure VS Code settings directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/.config/Code/User"
+        state: directory
+
+    - name: Update VS Code settings for terminal
+      ansible.builtin.blockinfile:
+        path: "{{ ansible_env.HOME }}/.config/Code/User/settings.json"
+        block: |
+          {
+            "terminal.integrated.fontFamily": "Ubuntu Mono",
+            "terminal.integrated.fontSize": 12
+          }
+        marker: '"{mark} Ansible managed block for terminal settings"'
+
