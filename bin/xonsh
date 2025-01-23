@@ -59,7 +59,7 @@ trezor-udev: FORCE
 	fi
 
 # The convenient path I will type
-.venvs: .local/share/venvs
+.venvs:
 	mkdir -p .local/share/venvs  # XDG Base Directory Specification
 	ln -s .local/share/venvs $@  # The easy location
 
