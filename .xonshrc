@@ -2,3 +2,23 @@
 $PROMPT = '{env_name}{BOLD_GREEN}{user}@{hostname}{BOLD_BLUE} {cwd}{branch_color}{curr_branch: {}}{RESET} {RED}{last_return_code_if_nonzero:[{BOLD_INTENSE_RED}{}{RED}] }{RESET}{BOLD_BLUE}{prompt_end}{RESET} '
 # XONSH WEBCONFIG END
 $DYNAMIC_CWD_WIDTH = '20'
+
+# Activate venv if applicable
+import os
+import sys
+
+# Get Python's executable path
+python_path = sys.executable
+
+# Detect if Python is running from a virtual environment
+if "VIRTUAL_ENV" not in os.environ:
+    venv_root = os.path.dirname(os.path.dirname(python_path)) 
+    bin_dir = "Scripts" if os.name == "nt" else "bin"
+    venv_python = os.path.join(venv_root, bin_dir, "python")
+
+    if os.path.samefile(python_path, venv_python):  # Confirm venv match
+        $VIRTUAL_ENV = venv_root
+        venv_name = os.path.basename(venv_root) 
+        if venv_name.lower() == "xonsh":
+            $VIRTUAL_ENV_DISABLE_PROMPT = 1  # Prevents modifying the prompt
+        $PATH.insert(0, os.path.join(venv_root, bin_dir))  # Prepend venv's bin/Scripts to PATH

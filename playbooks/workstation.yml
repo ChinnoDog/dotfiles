@@ -92,6 +92,9 @@
       - mono-complete
       - flatpak
       - flatpak-builder
+      # heif/heic support
+      - libheif1
+      - heif-thumbnailer 
       # Needed for dropbox
       # - python3-gpg
       # cli
@@ -182,7 +185,7 @@
     - com.slack.Slack
     - com.discordapp.Discord
     - org.kde.okular
-    - net.cozic.joplin_desktop
+    - md.obsidian.Obsidian
     #- com.obsproject.Studio
     #- com.spotify.Client
 

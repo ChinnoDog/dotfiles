@@ -32,3 +32,7 @@ endif
 
 " Recognize Vagrantfile as ruby
 autocmd BufNewFile,BufRead Vagrantfile set filetype=ruby
+
+" use tabs in makefiles
+autocmd FileType make setlocal noexpandtab
+

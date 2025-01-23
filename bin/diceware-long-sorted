@@ -1,0 +1,111 @@
+#!/bin/env python3
+# https://chatgpt.com/share/574243a5-a479-486f-a795-9279b6c4e462
+
+import nltk
+from nltk.corpus import wordnet
+import requests
+from collections import defaultdict
+import math
+
+# Ensure the required NLTK resources are downloaded
+nltk.download('averaged_perceptron_tagger')
+nltk.download('wordnet')
+nltk.download('tagsets')
+
+# Download the word list from the official source
+url = 'https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt'
+response = requests.get(url)
+lines = response.text.splitlines()
+
+# Extract the words from the file
+words = [line.split()[1] for line in lines if len(line.split()) > 1]
+
+# Function to get part of speech for a word using NLTK's pos_tag
+def get_pos_tag(word):
+    try:
+        tag = nltk.pos_tag([word])[0][1]
+        return tag
+    except:
+        return None
+
+# Function to get the primary part of speech category without qualifiers
+def get_primary_pos_category(tag):
+    try:
+        tagset = nltk.data.load('help/tagsets/upenn_tagset.pickle')
+        primary_category = tagset[tag][0].split(',')[0].strip().split()[0]  # Extract the primary category
+        return primary_category
+    except KeyError:
+        return "Unknown"
+
+# Function to map specific categories to general ones
+def map_to_general_category(category):
+    category_mappings = {
+        'Wh-adverb': 'Adverb',
+        'Numeral': 'Adjective',
+        'Wh-pronoun': 'Pronoun',
+        'Wh-determiner': 'Determiner',
+        'Modal': 'Verb'
+    }
+    return category_mappings.get(category.capitalize(), category.capitalize())
+
+# Function to get all possible parts of speech for a word using WordNet
+def get_all_possible_pos(word):
+    synsets = wordnet.synsets(word)
+    pos_categories = set()
+    pos_mapping = {
+        'n': 'Noun',
+        'v': 'Verb',
+        'a': 'Adjective',
+        's': 'Adjective',  # satellite adjective
+        'r': 'Adverb'
+    }
+    for synset in synsets:
+        pos = synset.pos()
+        if pos in pos_mapping:
+            pos_categories.add(pos_mapping[pos])
+    return pos_categories
+
+# Categorize words into a dictionary
+categorized_words = defaultdict(list)
+
+for word in words:
+    primary_category = get_pos_tag(word)
+    if primary_category:
+        primary_category = map_to_general_category(get_primary_pos_category(primary_category))
+        categorized_words[primary_category].append(word)
+    # Add the word to all possible categories
+    possible_categories = get_all_possible_pos(word)
+    for category in possible_categories:
+        categorized_words[category].append(word)
+
+# Remove duplicates within each category
+for category in categorized_words:
+    categorized_words[category] = list(set(categorized_words[category]))
+
+# Function to generate dice numbering
+def generate_dice_numbering(index, num_dice):
+    # Generate a dice roll number string like '111', '112', etc.
+    dice_number = []
+    for i in range(num_dice):
+        dice_number.append(str((index // (6 ** i) % 6) + 1))
+    return ''.join(reversed(dice_number))
+
+# Output the categorized words to the screen
+for pos, word_list in categorized_words.items():
+    word_list.sort()
+    num_words = len(word_list)
+    num_dice = math.ceil(math.log(num_words, 6))  # Calculate how many dice are needed
+    
+    print(f"\n{pos}:")
+    
+    num_rows = math.ceil(num_words / 6)
+    for row in range(num_rows):
+        for col in range(6):
+            index = row * 6 + col
+            if index < num_words:
+                dice_number = generate_dice_numbering(index, num_dice)
+                print(f"{dice_number} {word_list[index]:<10}", end=' ')
+        print()
+
+print("Words have been categorized and displayed.")
+
