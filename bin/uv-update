@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# Remove user apps from before PEP 668
+echo Disposing of old python applications
+rm -rf ~/.local/bin/__pycache__
+awk 'FNR==1 && /^#!\/usr\/bin\/python3/ {print FILENAME}' ~/.local/bin/* 2>/dev/null \
+  | tee | xargs -I{} rm {}
+
+# Install / update uv
+if [ ! -f .local/bin/uv ]; then
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+else
+  uv self update
+fi
+
+# Install latest python
+uv python install
+
+# Install xonsh
+uv tool install xonsh \
+  --python 3.12
+
+# Install my python programs
+for t in ansible ansible-core; do
+  uv tool install $t
+done
