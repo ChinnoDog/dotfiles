@@ -9,6 +9,8 @@
 !.bashrc
 !.bashrc.d
 !.profile
+!makefile
+!/makefile.d
 
 # ...even if they are in subdirectories
 #!*/
