@@ -3,6 +3,7 @@
 
 # But not these files...
 !.gitignore
+!.gitconfig
 !/bin
 !/.local/bin
 !/playbooks
@@ -22,4 +23,5 @@
 
 # But especially ignore these files
 .bashrc.d/99-private.sh
+.bashrc.d/.bashrc
 
