@@ -3,3 +3,5 @@
 	name = Stephen Nichols
 [include]
 	path = ~/.gitconfig.local
+[pull]
+	rebase = true
