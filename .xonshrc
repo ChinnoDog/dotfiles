@@ -1,4 +1,15 @@
+$XONSH_SHOW_TRACEBACK = True
+
 # XONSH WEBCONFIG START
-$PROMPT = '{env_name}{BOLD_GREEN}{user}@{hostname}{BOLD_BLUE} {cwd}{branch_color}{curr_branch: {}}{RESET} {RED}{last_return_code_if_nonzero:[{BOLD_INTENSE_RED}{}{RED}] }{RESET}{BOLD_BLUE}{prompt_end}{RESET} '
+xontrib load coreutils
 # XONSH WEBCONFIG END
 $DYNAMIC_CWD_WIDTH = '20'
+
+# praw variables
+#reddit_app = {
+#  client_id: 'NINxxq9QC9YnAGgSmTpkeg',
+#  client_secret: 'lJ_9rCTaAkVMKta1ob3UJlJ5dpKYBQ',
+#  user_agent: 'python:scraper:v1.0',
+#}
+
+# source-foreign "c:\Program Files\Git\bin\bash.exe" $USERPROFILE/.pipx-completions.sh 

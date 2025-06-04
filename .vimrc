@@ -32,3 +32,20 @@ endif
 
 " Recognize Vagrantfile as ruby
 autocmd BufNewFile,BufRead Vagrantfile set filetype=ruby
+
+" Disable mouse support
+set mouse=
+
+function! ClearAndPasteInsert()
+  normal! ggdG
+  set paste
+  startinsert
+endfunction
+
+command! Replace call ClearAndPasteInsert()
+
+" Make sure backspace works
+set backspace=2
+
+" Map key for yanking to system clipboard
+vnoremap Y "+y
