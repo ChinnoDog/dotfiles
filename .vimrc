@@ -53,6 +53,27 @@ vnoremap Y "+y
 " use tabs in makefiles
 autocmd FileType make setlocal noexpandtab
 
+" Configure folding
 set foldmethod=syntax            " Enable folding
 set foldlevelstart=99            " Start with all folds open
 set number                       " enable line numbering
+
+" Make sure backspace works
+set backspace=2
+
+" disable mouse support
+set mouse=
+
+function! ClearAndPasteInsert()
+  normal! ggdG
+  set paste
+  startinsert
+endfunction
+
+command! Replace call ClearAndPasteInsert()
+
+" Map key for yanking to system clipboard
+vnoremap Y "+y
+
+" Syntax highlighting for .ssh/config.d/*
+au BufNewFile,BufRead ssh_config,*/.ssh/config.d/*  setf sshconfig

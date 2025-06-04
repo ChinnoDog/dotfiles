@@ -13,6 +13,14 @@
 !makefile
 !/makefile.d
 
+# OpenSSH
+!.ssh
+.ssh/*
+!.ssh/config
+!.ssh/config.d
+.ssh/config.d/*private*
+!.ssh/config.d/*.template
+
 # ...even if they are in subdirectories
 #!*/
 
