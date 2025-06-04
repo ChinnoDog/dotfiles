@@ -1,4 +1,5 @@
 #!/bin/sh
+# Configure the behavior of the bash prompt
 
 # https://askubuntu.com/questions/339546/how-do-i-see-the-history-of-the-commands-i-have-run-in-tmux#answer-339925
 

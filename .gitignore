@@ -3,12 +3,15 @@
 
 # But not these files...
 !.gitignore
+!.gitconfig
 !/bin
 !/.local/bin
 !/playbooks
 !.bashrc
 !.bashrc.d
 !.profile
+!makefile
+!/makefile.d
 
 # ...even if they are in subdirectories
 #!*/
@@ -20,4 +23,5 @@
 
 # But especially ignore these files
 .bashrc.d/99-private.sh
+.bashrc.d/.bashrc
 

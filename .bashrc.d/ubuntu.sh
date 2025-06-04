@@ -1,3 +1,6 @@
+#!/bin/sh
+# Ubuntu-related customizations
+
 # https://askubuntu.com/questions/313806/how-to-list-available-backport-upgrades
 . /etc/os-release
 if [ $ID == "ubuntu" ]; then

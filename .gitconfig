@@ -1,0 +1,7 @@
+[user]
+	email = ChinnoDog@lonesheep.net
+	name = Stephen Nichols
+[include]
+	path = ~/.gitconfig.local
+[pull]
+	rebase = true

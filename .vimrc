@@ -49,3 +49,10 @@ set backspace=2
 
 " Map key for yanking to system clipboard
 vnoremap Y "+y
+
+" use tabs in makefiles
+autocmd FileType make setlocal noexpandtab
+
+set foldmethod=syntax            " Enable folding
+set foldlevelstart=99            " Start with all folds open
+set number                       " enable line numbering
