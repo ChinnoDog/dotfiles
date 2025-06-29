@@ -14,12 +14,18 @@ if [ -a "$b" ]; then
   fi
 fi
 
-# Set dark mode
 echo "Setting dark mode"
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
 
-# Install github cli
+if ! command -v vim; then
+echo "Installing useful packages"
+  apt update
+  apt install -y \
+    vim \
+    :
+fi
+
 if ! command -v gh; then
   echo "Installing github cli"
   (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) \
@@ -33,15 +39,8 @@ if ! command -v gh; then
   && sudo apt install gh -y
 fi
 
-# Install other useful packages
-if ! command -v vim; then
-  apt install -y \
-    vim \
-    :
-fi
-
-# Authenticate to github
 if ! gh auth status &>/dev/null; then
+  echo "Authenticating to github"
   gh auth login --hostname github.com --git-protocol https -w
 fi
 
