@@ -1,0 +1,42 @@
+#!/bin/bash
+# Set up Debian Live for my use
+
+set -e
+set -x
+
+# Dim the screen
+b=/sys/class/backlight/amdgpu_bl1/brightness
+l=70
+if [ -a "$b" ]; then
+  if [ "$(cat $b)" != "70" ]; then
+    echo "Dimming backlight"
+    echo 70 | sudo tee $b >/dev/null
+  fi
+fi
+
+for i in 0 1; do
+  if ! [ -a /dev/mapper/crypt${i} ]; then
+    if [ -z "$pw" ]; then
+      read -p "Enter LUKS password: " pw
+    fi
+    echo "Mounting crypt${i}"
+    echo $pw | sudo cryptsetup open /dev/nvme${i}n1p2 crypt${i}
+  fi
+done
+
+if ! mountpoint /mnt; then
+  echo "Mounting root volume"
+  sudo mount -o noatime,compress-force=zstd,subvol=@ /dev/mapper/crypt0 /mnt
+fi
+
+if ! mountpoint /mnt/boot/efi; then
+  echo "Mounting EFI partition"
+  sudo mount /dev/nvme0n1p1 /mnt/boot/efi
+fi
+
+for i in proc sys dev dev/pts run etc/resolv.conf; do
+  if ! mountpoint /mnt/$i; then
+    echo "Bind mounting $i"
+    sudo mount --bind /$i /mnt/$i
+  fi
+done

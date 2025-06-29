@@ -10,6 +10,7 @@
 !.bashrc
 !.bashrc.d
 !.profile
+!.profile.d
 !makefile
 !/makefile.d
 
@@ -32,4 +33,6 @@
 # But especially ignore these files
 .bashrc.d/99-private.sh
 .bashrc.d/.bashrc
+.profile.d/99-private.sh
+.profile.d/.profile
 

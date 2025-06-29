@@ -16,3 +16,4 @@ append_to_path() {
 }
 
 prepend_to_path "$HOME/.local/bin"
+prepend_to_path "$HOME/bin"

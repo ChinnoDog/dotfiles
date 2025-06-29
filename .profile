@@ -9,6 +9,11 @@ else
   esac
 fi
 
-# Include system default .profile
-. /etc/skel/.profile
+if [ -d "$HOME/.profile.d" ]; then
+  for i in "$HOME/.profile.d/.profile" "$HOME"/.bashrc.d/*.sh; do
+    [ -e "$i" ] || continue # Skip if no matching files
+    [ -r "$i" ] && . "$i"
+  done
+  unset i
+fi
 
