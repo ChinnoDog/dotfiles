@@ -20,10 +20,10 @@ gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
 
 if ! command -v vim; then
 echo "Installing useful packages"
-  apt update
-  apt install -y \
+  sudo apt update
+  sudo apt install -y \
     vim \
-    :
+    ;
 fi
 
 if ! command -v gh; then
