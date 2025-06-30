@@ -54,10 +54,11 @@ fi
 #   fi
 # done
 
+raid_dev="/dev/$(grep nvme0n1p2 /proc/mdstat | cut -f1 -d' ')"
 crypt_dev="md0_crypt"
 
 if ! [ -a /dev/mapper/${crypt_dev} ]; then
-  sudo cryptsetup open /dev/md126 ${crypt_dev}
+  sudo cryptsetup open ${raid_dev} ${crypt_dev}
 fi
 
 if ! mountpoint /mnt; then
