@@ -44,19 +44,25 @@ if ! gh auth status &>/dev/null; then
   gh auth login --hostname github.com --git-protocol https -w
 fi
 
-for i in 0 1; do
-  if ! [ -a /dev/mapper/crypt${i} ]; then
-    if [ -z "$pw" ]; then
-      read -p "Enter LUKS password: " pw
-    fi
-    echo "Mounting crypt${i}"
-    echo $pw | sudo cryptsetup open /dev/nvme${i}n1p2 crypt${i}
-  fi
-done
+# for i in 0 1; do
+#   if ! [ -a /dev/mapper/crypt${i} ]; then
+#     if [ -z "$pw" ]; then
+#       read -p "Enter LUKS password: " pw
+#     fi
+#     echo "Mounting crypt${i}"
+#     echo $pw | sudo cryptsetup open /dev/nvme${i}n1p2 crypt${i}
+#   fi
+# done
+
+crypt_dev="md0_crypt"
+
+if ! [ -a /dev/mapper/${crypt_dev} ]; then
+  sudo cryptsetup open /dev/md126 ${crypt_dev}
+fi
 
 if ! mountpoint /mnt; then
   echo "Mounting root volume"
-  sudo mount -o noatime,compress-force=zstd,subvol=@ /dev/mapper/crypt0 /mnt
+  sudo mount -o noatime,compress-force=zstd,subvol=@ /dev/mapper/${crypt_dev} /mnt
 fi
 
 if ! mountpoint /mnt/boot/efi; then
