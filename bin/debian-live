@@ -63,7 +63,12 @@ fi
 
 if ! mountpoint /mnt; then
   echo "Mounting root volume"
-  sudo mount -o noatime,compress-force=zstd,subvol=@ /dev/mapper/${crypt_dev} /mnt
+  sudo mount -o defaults,noatime,compress-force=zstd,subvol=@ /dev/mapper/${crypt_dev} /mnt
+fi
+
+if ! mountpoint /mnt/home; then
+  echo "Mounting home partition"
+  sudo mount -o defaults,noatime,compress-force=zstd,subvol=@home /dev/mapper/${crypt_dev} /mnt/home
 fi
 
 if ! mountpoint /mnt/boot/efi; then
