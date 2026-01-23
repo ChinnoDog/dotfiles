@@ -22,6 +22,21 @@
 .ssh/config.d/*private*
 !.ssh/config.d/*.template
 
+# Orca Slicer 
+!.var/
+.var/*
+!.var/app/
+.var/app/*
+!.var/app/io.github.softfever.OrcaSlicer/
+.var/app/io.github.softfever.OrcaSlicer/*
+!.var/app/io.github.softfever.OrcaSlicer/config/
+.var/app/io.github.softfever.OrcaSlicer/config/*
+!.var/app/io.github.softfever.OrcaSlicer/config/OrcaSlicer/
+.var/app/io.github.softfever.OrcaSlicer/config/OrcaSlicer/*
+!.var/app/io.github.softfever.OrcaSlicer/config/OrcaSlicer/user/
+.var/app/io.github.softfever.OrcaSlicer/config/OrcaSlicer/user/*
+!.var/app/io.github.softfever.OrcaSlicer/config/OrcaSlicer/user/default/
+
 # ...even if they are in subdirectories
 #!*/
 

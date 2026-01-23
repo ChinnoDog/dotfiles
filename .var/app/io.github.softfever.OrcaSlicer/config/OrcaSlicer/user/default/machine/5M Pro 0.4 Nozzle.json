@@ -1,0 +1,10 @@
+{
+    "from": "User",
+    "host_type": "flashforge",
+    "inherits": "Flashforge Adventurer 5M Pro 0.4 Nozzle",
+    "is_custom_defined": "0",
+    "name": "5M Pro 0.4 Nozzle",
+    "print_host": "192.168.0.185",
+    "printer_settings_id": "5M Pro 0.4 Nozzle",
+    "version": "2.3.1.10"
+}
