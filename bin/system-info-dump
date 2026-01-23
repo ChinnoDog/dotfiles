@@ -1,0 +1,12 @@
+#!/bin/bash
+# Dump system information for ChatGPT
+
+outfile="$(basename $0).txt"
+if [[ -z "${SELF_LOGGED:-}" ]]; then
+  exec env SELF_LOGGED=1 bash "$0" > "$outfile" 2>&1
+fi
+
+set -xeuo pipefail
+
+sudo inxi -Fzxxx --no-host
+sudo lshw -sanitize -numeric

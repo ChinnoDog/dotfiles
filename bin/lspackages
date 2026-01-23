@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+import apt
+
+cache = apt.Cache()
+
+# 1. All manually installed packages
+manual_pkgs = [pkg for pkg in cache if pkg.is_installed and not pkg.is_auto_installed]
+
+# 2. All packages that are dependencies of manual packages
+dependency_names = set()
+for pkg in manual_pkgs:
+    for dep_list in pkg.installed.dependencies:
+        for dep in dep_list:
+            if dep.name:
+                dependency_names.add(dep.name)
+
+# 3. Top-level manual packages = manual - dependencies of manual
+top_level = sorted(pkg.name for pkg in manual_pkgs if pkg.name not in dependency_names)
+
+for name in top_level:
+    print(name)
